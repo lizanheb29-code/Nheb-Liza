@@ -1,0 +1,170 @@
+/* កំណត់ទម្រង់ទូទៅ (Reset & Typography) */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+body {
+    background-color: #0b111e;
+    color: #ffffff;
+    overflow-x: hidden;
+}
+
+/* ស្ទីលសម្រាប់ផ្នែកនីមួយៗ (Full Viewport) */
+section {
+    position: relative;
+    width: 100%;
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow: hidden;
+}
+
+/* ==========================================
+   ១. ចលនាសម្រាប់ផ្នែក Hero (រូបភាពដំបូង)
+   ========================================== */
+.hero-section {
+    perspective: 1000px;
+}
+
+.hero-bg {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    /* ប្រើប្រាស់រូបភាពកោះ/ភ្នំពី Unsplash ជាគំរូ */
+    background: url('https://images.unsplash.com/photo-1469474968028-56623f02e42e?w=1600') center/cover no-repeat;
+    z-index: 1;
+    
+    /* កំណត់ឱ្យមានចលនាតាមការ Scroll */
+    animation: zoomOutImage linear both;
+    animation-timeline: scroll(root);
+    animation-range: start 0% end 100%;
+}
+
+.hero-title {
+    position: relative;
+    z-index: 2;
+    display: flex;
+    align-items: center;
+    gap: 4rem;
+    font-size: 2.5rem;
+    letter-spacing: 12px;
+    font-weight: 300;
+    
+    /* ចលនាអក្សរហោះចេញពេល Scroll */
+    animation: fadeOutText linear both;
+    animation-timeline: scroll(root);
+    animation-range: start 0% end 50%;
+}
+
+.side-text {
+    font-size: 1rem;
+    opacity: 0.6;
+    letter-spacing: 6px;
+}
+
+/* Keyframes សម្រាប់ Hero */
+@keyframes zoomOutImage {
+    to {
+        transform: scale(0.85);
+        border-radius: 40px;
+        opacity: 0.3;
+    }
+}
+
+@keyframes fadeOutText {
+    to {
+        opacity: 0;
+        transform: translateY(-100px) scale(0.9);
+    }
+}
+
+/* ==========================================
+   ២. ចលនាសម្រាប់ផ្នែកអក្សរ និងរូបភាពនាវា (Content & Ship)
+   ========================================== */
+.content-section {
+    padding: 0 10%;
+}
+
+.text-center {
+    text-align: center;
+}
+
+.content-left {
+    max-width: 600px;
+    text-align: left;
+    z-index: 2;
+}
+
+/* រូបភាពនាវាផ្នែកទី ៣ */
+.ship-bg {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: url('https://images.unsplash.com/photo-1518241353330-0f7941c2d9b5?w=1600') center/cover no-repeat;
+    opacity: 0.2;
+    z-index: 1;
+    
+    /* ចលនារូបភាពនាវារីកធំបន្តិចម្តងៗពេល Scroll មកដល់ */
+    animation: zoomInImage linear both;
+    animation-timeline: view();
+    animation-range: entry 0% exit 100%;
+}
+
+@keyframes zoomInImage {
+    from { transform: scale(1.2); }
+    to { transform: scale(1); }
+}
+
+/* ==========================================
+   ៣. ចលនាអក្សររលូន (Smooth Text Reveal)
+   ========================================== */
+.reveal-text {
+    font-size: 2.5rem;
+    font-weight: 400;
+    letter-spacing: 2px;
+    line-height: 1.3;
+    margin-bottom: 20px;
+    
+    /* ចលនាអក្សរលេចឡើង */
+    animation: fadeUp linear both;
+    animation-timeline: view();
+    animation-range: entry 20% cover 50%;
+}
+
+.reveal-p {
+    font-size: 1.1rem;
+    color: #a0aec0;
+    line-height: 1.8;
+    max-width: 700px;
+    margin: 0 auto;
+    
+    /* ចលនាអត្ថបទតូចលេចឡើង */
+    animation: fadeUp linear both;
+    animation-timeline: view();
+    animation-range: entry 30% cover 60%;
+}
+
+@keyframes fadeUp {
+    from {
+        opacity: 0;
+        transform: translateY(60px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+html{
+    scroll-behavior: smooth;
+}
+
+

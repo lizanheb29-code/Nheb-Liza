@@ -1,0 +1,271 @@
+/* កំណត់ទម្រង់ទូទៅ (Reset & Variables) */
+:root {
+    --bg-main: #230406;       /* ពណ៌ក្រហម مرون ចាស់ខ្លាំង */
+    --bg-card: #3a0a10;       /* ពណ៌ប្រអប់ */
+    --text-gold: #ebd2be;     /* ពណ៌អក្សរបែបគ្រីម/មាស */
+    --text-white: #ffffff;
+    --font-serif: 'Playfair Display', serif;
+    --font-sans: 'Inter', sans-serif;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    background-color: var(--bg-main);
+    color: var(--text-white);
+    font-family: var(--font-sans);
+    padding: 20px;
+    display: flex;
+    justify-content: center;
+}
+
+.portfolio-container {
+    width: 100%;
+    max-width: 1000px;
+    display: flex;
+    flex-direction: column;
+    gap: 25px;
+}
+
+/* ==========================================
+   ១. HERO SECTION
+   ========================================== */
+.hero-section {
+    background-color: var(--bg-card);
+    border-radius: 24px;
+    padding: 40px;
+    display: grid;
+    grid-template-columns: 1fr 1.2fr 1fr;
+    align-items: center;
+    position: relative;
+    overflow: hidden;
+    min-height: 450px;
+    box-shadow: 0 20px 40px rgba(0,0,0,0.5);
+}
+
+.hero-left {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.main-title {
+    font-family: var(--font-serif);
+    font-size: 3.5rem;
+    color: var(--text-white);
+    line-height: 1;
+}
+
+.sub-tags {
+    display: flex;
+    flex-direction: column;
+    font-size: 1.8rem;
+    font-weight: 600;
+    color: var(--text-gold);
+    letter-spacing: 2px;
+}
+
+.social-links {
+    font-size: 0.85rem;
+    opacity: 0.7;
+}
+
+.hero-center-img {
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: flex-end;
+}
+
+.hero-center-img img {
+    width: 100%;
+    height: 380px;
+    object-fit: cover;
+    border-radius: 20px;
+}
+
+.hero-right {
+    text-align: right;
+}
+
+.brand-name {
+    font-size: 0.9rem;
+    letter-spacing: 4px;
+    color: var(--text-gold);
+}
+
+.designer-text {
+    font-size: 3.5rem;
+    font-weight: 600;
+    line-height: 0.9;
+    letter-spacing: -1px;
+    margin-top: 10px;
+}
+
+/* ==========================================
+   ២. CONTENT GRID (ABOUT & PROCESS)
+   ========================================== */
+.content-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 25px;
+}
+
+.card {
+    background-color: var(--bg-card);
+    border-radius: 20px;
+    padding: 30px;
+}
+
+.full-width {
+    grid-column: span 2;
+}
+
+/* About Card */
+.about-content {
+    display: flex;
+    gap: 20px;
+    align-items: center;
+}
+
+.avatar-placeholder img {
+    width: 90px;
+    height: 90px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid var(--text-gold);
+}
+
+.about-text h3, .stages-card h3, .projects-card h3 {
+    font-family: var(--font-serif);
+    color: var(--text-gold);
+    margin-bottom: 15px;
+    font-size: 1.5rem;
+}
+
+.about-text p {
+    font-size: 0.95rem;
+    line-height: 1.6;
+    opacity: 0.9;
+}
+
+/* Stages Card */
+.stages-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.stage-item {
+    background: rgba(255, 255, 255, 0.05);
+    padding: 10px 15px;
+    border-radius: 10px;
+    font-size: 0.9rem;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.stage-item span {
+    color: var(--text-gold);
+    font-weight: 600;
+}
+
+/* Project Card (Mockups) */
+.project-mockups {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 15px;
+    margin-top: 15px;
+}
+
+.mockup-item img {
+    width: 100%;
+    height: 180px;
+    object-fit: cover;
+    border-radius: 12px;
+    transition: transform 0.3s ease;
+}
+
+.mockup-item img:hover {
+    transform: scale(1.03);
+}
+
+/* ==========================================
+   ៣. FOOTER SECTION
+   ========================================== */
+.footer-section {
+    background-color: var(--bg-card);
+    border-radius: 24px;
+    padding: 40px;
+    display: grid;
+    grid-template-columns: 1.5fr 1fr;
+    gap: 30px;
+    align-items: center;
+}
+
+.cta-box h2 {
+    font-family: var(--font-serif);
+    font-size: 2.2rem;
+    color: var(--text-gold);
+    margin-bottom: 15px;
+}
+
+
+.cta-box p {
+    margin-bottom: 25px;
+    opacity: 0.8;
+    line-height: 1.6;
+}
+
+.qr-container {
+    display: flex;
+    gap: 20px;
+}
+
+.qr-code {
+    background: rgba(235, 210, 190, 0.1);
+    border: 1px dashed var(--text-gold);
+    padding: 20px;
+    border-radius: 12px;
+    font-size: 0.8rem;
+    color: var(--text-gold);
+    text-align: center;
+    flex: 1;
+}
+
+.footer-img img {
+    width: 100%;
+    height: 250px;
+    object-fit: cover;
+    border-radius: 50% 50% 0 0; /* រាងកោងមូលខាងលើដូចក្នុងរូបភាព */
+    border: 2px solid var(--text-gold);
+}
+
+/* Responsive សម្រាប់ទូរសព្ទដៃ */
+@media (max-width: 768px) {
+    .hero-section, .content-grid, .footer-section {
+        grid-template-columns: 1fr;
+    }
+    .full-width {
+        grid-column: span 1;
+    }
+    .hero-section {
+        text-align: center;
+    }
+    .hero-right {
+        text-align: center;
+    }
+    .project-mockups {
+        grid-template-columns: 1fr;
+    }
+}
+
+
+.qr-container{
+    
+}
