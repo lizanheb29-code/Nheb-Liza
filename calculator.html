@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calculadora Futurista</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=VT323&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-gradient: linear-gradient(135deg, #0f0c1b, #201335, #0b192e);
+            --calc-bg: rgba(25, 18, 46, 0.65);
+            --screen-bg: #120e24;
+            --neon-cyan: #00f3ff;
+            --neon-magenta: #ff0055;
+            --text-color: #ffffff;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background: var(--bg-gradient);
+            font-family: 'Segoe UI', Roboto, sans-serif;
+        }
+
+        /* Glassmorphism Chassis */
+        .calculator-container {
+            background: var(--calc-bg);
+            backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 25px;
+            border-radius: 24px;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5),
+                inset 0 1px 2px rgba(255, 255, 255, 0.2);
+            width: 320px;
+        }
+
+        /* CRT Screen Wrapper */
+        .calculator-screen {
+            background-color: var(--screen-bg);
+            padding: 20px;
+            border-radius: 14px;
+            margin-bottom: 24px;
+            text-align: right;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-end;
+            min-height: 80px;
+            box-shadow: inset 0 0 15px rgba(0, 0, 0, 0.8),
+                0 0 10px rgba(0, 243, 255, 0.15);
+            border: 1px solid rgba(0, 243, 255, 0.2);
+            overflow: hidden;
+            perspective: 100px;
+            /* Crucial for generating your 3D rotateX effect */
+        }
+
+        /* original snippet logic applied here */
+        .current-operand {
+            position: relative;
+            height: auto;
+            margin-top: 5px;
+            overflow-wrap: anywhere;
+            color: var(--neon-cyan);
+            text-shadow: 0 0 8px rgba(0, 243, 255, 0.6);
+            line-height: 29px;
+            transform: rotateX(5deg);
+            opacity: .9;
+            z-index: 3;
+            font-family: "VT323", monospace;
+            font-size: 36px;
+        }
+
+        /* original snippet logic applied here */
+        .previous-operand {
+            position: relative;
+            height: 20px;
+            overflow-wrap: anywhere;
+            color: var(--neon-magenta);
+            text-shadow: 0 0 5px rgba(255, 0, 85, 0.4);
+            padding-right: 5px;
+            opacity: .3;
+            transform: rotateX(-17deg);
+            font-family: "VT323", monospace;
+            font-size: 20px;
+        }
+
+        /* Keyboard Configuration */
+        .calculator-keys {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 12px;
+        }
+
+        /* Core Key Styling */
+        .key {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 18px;
+            border-radius: 12px;
+            color: var(--text-color);
+            font-size: 18px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .key:hover {
+            background: rgba(255, 255, 255, 0.15);
+            box-shadow: 0 0 10px rgba(255, 255, 255, 0.1);
+        }
+
+        .key:active {
+            transform: scale(0.95);
+        }
+
+        /* Variant UI Colors */
+        .operator {
+            color: var(--neon-cyan);
+            background: rgba(0, 243, 255, 0.05);
+            border-color: rgba(0, 243, 255, 0.2);
+        }
+
+        .operator:hover {
+            background: rgba(0, 243, 255, 0.2);
+            box-shadow: 0 0 12px rgba(0, 243, 255, 0.4);
+        }
+
+        .function {
+            color: var(--neon-magenta);
+            background: rgba(255, 0, 85, 0.05);
+            border-color: rgba(255, 0, 85, 0.2);
+        }
+
+        .function:hover {
+            background: rgba(255, 0, 85, 0.2);
+            box-shadow: 0 0 12px rgba(255, 0, 85, 0.4);
+        }
+
+        .equals {
+            grid-column: span 2;
+            background: linear-gradient(135deg, var(--neon-magenta), #bc00dd);
+            border: none;
+            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+        }
+
+        .equals:hover {
+            background: linear-gradient(135deg, #ff2a75, #ce1bf0);
+            box-shadow: 0 0 15px rgba(255, 0, 85, 0.5);
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="calculator-container">
+
+        <div class="calculator-screen">
+            <div class="previous-operand"></div>
+            <div class="current-operand">0</div>
+        </div>
+
+        <div class="calculator-keys">
+            <button class="key function" data-action="clear">AC</button>
+            <button class="key function" data-action="delete">DEL</button>
+            <button class="key operator" data-operator="divide">÷</button>
+
+            <button class="key number" data-number="seven">7</button>
+            <button class="key number" data-number="eight">8</button>
+            <button class="key number" data-number="nine">9</button>
+            <button class="key operator" data-operator="multiply">×</button>
+
+            <button class="key number" data-number="four">4</button>
+            <button class="key number" data-number="five">5</button>
+            <button class="key number" data-number="six">6</button>
+            <button class="key operator" data-operator="subtract">-</button>
+
+            <button class="key number" data-number="one">1</button>
+            <button class="key number" data-number="two">2</button>
+            <button class="key number" data-number="three">3</button>
+            <button class="key operator" data-operator="add">+</button>
+
+            <button class="key number" data-number="zero">0</button>
+            <button class="key decimal" data-action="decimal">.</button>
+            <button class="key equals" data-action="calculate">=</button>
+        </div>
+
+    </div>
+
+    <script src="script.js"></script>
+    <script>
+        // Your map dependencies
+        const numKeyOutputMap = {
+            "one": "1", "two": "2", "three": "3", "four": "4", "five": "5",
+            "six": "6", "seven": "7", "eight": "8", "nine": "9", "zero": "0",
+        };
+
+        const operators = {
+            add: "+", subtract: "-", multiply: "*", divide: "/",
+        };
+
+        // UI Selectors
+        const currentDisplay = document.querySelector('.current-operand');
+        const previousDisplay = document.querySelector('.previous-operand');
+        const keysContainer = document.querySelector('.calculator-keys');
+
+        let currentInput = '0';
+        let previousInput = '';
+        let activeOperator = null;
+        let resetScreenOnNextInput = false;
+
+        // Global Event listener delegation
+        keysContainer.addEventListener('click', (e) => {
+            if (!e.target.matches('button')) return;
+
+            const button = e.target;
+            const { number, operator, action } = button.dataset;
+
+            if (number) handleNumber(numKeyOutputMap[number]);
+            if (operator) handleOperator(operator);
+            if (action) handleAction(action);
+
+            updateDisplay();
+        });
+
+        function handleNumber(numString) {
+            if (currentInput === '0' || resetScreenOnNextInput) {
+                currentInput = numString;
+                resetScreenOnNextInput = false;
+            } else {
+                if (currentInput.length < 12) currentInput += numString;
+            }
+        }
+
+        function handleOperator(opKey) {
+            const opSymbol = operators[opKey];
+
+            if (activeOperator && !resetScreenOnNextInput) {
+                calculateResult();
+            }
+
+            previousInput = currentInput;
+            activeOperator = opSymbol;
+            resetScreenOnNextInput = true;
+        }
+
+        function handleAction(action) {
+            switch (action) {
+                case 'clear':
+                    currentInput = '0';
+                    previousInput = '';
+                    activeOperator = null;
+                    break;
+                case 'delete':
+                    currentInput = currentInput.length > 1 ? currentInput.slice(0, -1) : '0';
+                    break;
+                case 'decimal':
+                    if (!currentInput.includes('.')) currentInput += '.';
+                    break;
+                case 'calculate':
+                    if (activeOperator) {
+                        calculateResult();
+                        activeOperator = null;
+                        resetScreenOnNextInput = true;
+                    }
+                    break;
+            }
+        }
+
+        function calculateResult() {
+            const prev = parseFloat(previousInput);
+            const current = parseFloat(currentInput);
+            if (isNaN(prev) || isNaN(current)) return;
+
+            let result = 0;
+            switch (activeOperator) {
+                case '+': result = prev + current; break;
+                case '-': result = prev - current; break;
+                case '*': result = prev * current; break;
+                case '/':
+                    result = current === 0 ? 'Error' : prev / current;
+                    break;
+            }
+
+            if (typeof result === 'number') {
+                result = Math.round(result * 1000000) / 1000000;
+            }
+
+            previousInput = `${prev} ${activeOperator} ${current}`;
+            currentInput = String(result);
+        }
+
+        function updateDisplay() {
+            currentDisplay.textContent = currentInput;
+            previousDisplay.textContent = (activeOperator && resetScreenOnNextInput)
+                ? `${previousInput} ${activeOperator} `
+                : previousInput;
+        }
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Falling Words</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            height: 100vh;
+            background-color: #0b0c10;
+            overflow: hidden;
+            font-family: 'Courier New', Courier, monospace;
+            color: #1f2833;
+        }
+
+        main {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        /* លាក់អត្ថបទដើមកុំឱ្យឃើញ ព្រោះយើងនឹងយកវាទៅបង្កើតជា Physics Object វិញ */
+        .text {
+            display: none;
+        }
+
+        /* ស្ទីលសម្រាប់ពាក្យនីមួយៗដែលត្រូវធ្លាក់ */
+        .word-element {
+            position: absolute;
+            color: #66fcf1;
+            /* ពណ៌ខៀវភ្លឺបែប Neon */
+            font-size: 16px;
+            font-weight: bold;
+            white-space: nowrap;
+            user-select: none;
+            pointer-events: none;
+            transform-origin: center center;
+        }
+    </style>
+</head>
+
+<body>
+
+    <main>
+        <div class="text">
+            with over ten years of experience foundation of technical knowledge and the ability Throughout my career, I
+            have led and participat implementation and maintenance of complex syste
+        </div>
+    </main>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/matter-js/0.19.0/matter.min.js"></script>
+    <script src="script.js"></script>
+    <script>
+        // ទាញយក Module នានាពី Matter.js
+        const { Engine, Render, World, Bodies, Body, Composite, Runner } = Matter;
+
+        // បង្កើត Physics Engine
+        const engine = Engine.create({
+            gravity: { y: 0.8 } // កំណត់កម្លាំងទំនាញដីឱ្យធ្លាក់ចុះក្រោម
+        });
+
+        const wordsContainer = document.body;
+        const textSource = document.querySelector('.text').innerText;
+        const wordsArray = textSource.split(/\s+/); // កាត់អត្ថបទជាពាក្យៗ
+
+        const wordBodies = [];
+
+        // ១. បង្កើតរបាំងបាតក្រោម និងជញ្ជាំងសងខាង ដើម្បីកុំឱ្យអក្សរធ្លាក់ធ្លាយចេញពីអេក្រង់
+        const ground = Bodies.rectangle(window.innerWidth / 2, window.innerHeight + 25, window.innerWidth, 50, { isStatic: true });
+        const leftWall = Bodies.rectangle(-25, window.innerHeight / 2, 50, window.innerHeight, { isStatic: true });
+        const rightWall = Bodies.rectangle(window.innerWidth + 25, window.innerHeight / 2, 50, window.innerHeight, { isStatic: true });
+
+        World.add(engine.world, [ground, leftWall, rightWall]);
+
+        // ២. បង្កើតរង្វង់ទំនាញរត់តាមក្បាល Mouse (Cursor)
+        const mouseConstraint = Bodies.circle(0, 0, 80, {
+            isStatic: true,
+            render: { visible: false } // លាក់រង្វង់នេះមិនឱ្យឃើញ
+        });
+        World.add(engine.world, mouseConstraint);
+
+        // ចាប់យកទីតាំងរាល់ពេលដែល Mouse ផ្លាស់ទី
+        window.addEventListener('mousemove', (event) => {
+            Body.setPosition(mouseConstraint, { x: event.clientX, y: event.clientY });
+        });
+
+        // ៣. មុខងារបង្កើតពាក្យនីមួយៗឱ្យទៅជា Physics Object
+        function createWordBody(word, index) {
+            // បង្កើត HTML Element សម្រាប់ពាក្យ
+            const element = document.createElement('div');
+            element.className = 'word-element';
+            element.innerText = word;
+            wordsContainer.appendChild(element);
+
+            // វាស់ទំហំទទឹង និងកម្ពស់ពាក្យនីមួយៗ
+            const width = element.offsetWidth || word.length * 10;
+            const height = element.offsetHeight || 20;
+
+            // កំណត់ទីតាំងធ្លាក់ (ធ្លាក់ពីលើព្រលយម្តងមួយៗនៅចំកណ្តាលអេក្រង់)
+            const x = window.innerWidth / 2 + (Math.random() * 100 - 50);
+            const y = -50 - (index * 25);
+
+            // បង្កើតប្រអប់ Physics ការពារពាក្យ
+            const body = Bodies.rectangle(x, y, width, height, {
+                restitution: 0.3, // ភាពលោតកណ្តក់
+                friction: 0.1,    // ភាពកកិត
+                density: 0.01
+            });
+
+            body.element = element; // ភ្ជាប់ element ទៅនឹង body
+            wordBodies.push(body);
+            World.add(engine.world, body);
+        }
+
+        // ចាប់ផ្តើមបង្កើតពាក្យទាំងអស់
+        wordsArray.forEach((word, index) => {
+            createWordBody(word, index);
+        });
+
+        // ៤. ចាប់ផ្តើមដំណើរការ Engine
+        const runner = Runner.create();
+        Runner.run(runner, engine);
+
+        // ៥. មុខងារ Update ទីតាំងអក្សរនៅលើអេក្រង់ទៅតាម Physics Engine
+        (function update() {
+            wordBodies.forEach(body => {
+                const { x, y } = body.position;
+                const angle = body.angle;
+
+                // បញ្ចូលទីតាំង និងមុំបង្វិលទៅកាន់ HTML Element
+                body.element.style.left = `${ x - body.element.offsetWidth / 2 } px`;
+                body.element.style.top = `${ y - body.element.offsetHeight / 2 } px`;
+                body.element.style.transform = rotate`(${ angle }rad)`;
+            });
+
+            requestAnimationFrame(update);
+        })();
+
+        // កែសម្រួលទំហំអេក្រង់ឡើងវិញពេលដូរទំហំ Window
+        window.addEventListener('resize', () => {
+            Body.setPosition(ground, { x: window.innerWidth / 2, y: window.innerHeight + 25 });
+            // អាចធ្វើបច្ចុប្បន្នភាពជញ្ជាំងស្តាំបន្ថែម...
+        });
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pou Animation</title>
+    <style>
+        /* --- CSS Layout & Pou Style --- */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        .container {
+            width: 100%;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-color: #f7f9fa;
+        }
+
+        .card {
+            text-align: center;
+        }
+
+        .box {
+            display: flex;
+            justify-content: center;
+            position: sticky;
+            margin-bottom: 20px;
+            height: 150px; /* កំណត់កម្ពស់ដើម្បីកុំឱ្យបុកគ្នាពេល Pou រីកធំ */
+            align-items: flex-end;
+        }
+
+        .pou {
+            width: 60px;
+            transition: all 0.5s ease-in-out;
+            font-family: sans-serif;
+        }
+
+        .eat {
+            margin-top: 8px;
+            cursor: pointer;
+            padding: 10px 20px;
+            font-size: 16px;
+            border-radius: 20px;
+            border: 1px solid #ccc;
+            background-color: #fff;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            transition: transform 0.1s;
+        }
+
+        .eat:active {
+            transform: scale(0.95);
+        }
+
+        /* --- CSS For Food Animation --- */
+        .food {
+            width: 14px;
+            height: 14px;
+            background-color: #f45c43;
+            border-radius: 100%;
+            position: absolute;
+            top: -100%;
+            opacity: 0;
+        }
+
+        .food.show {
+            animation: food 1.5s ease-in-out;
+        }
+
+        @keyframes food {
+            0% {
+                opacity: 1;
+                top: -100px;
+                transform: scale(1);
+            }
+            100% {
+                top: 70px;
+                transform: scale(0.5);
+                opacity: 0.8;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <div class="card">
+            <div class="box">
+                <div class="food"></div>
+                <img src="https://rerofya.github.io/resources/pou.png" class="pou" alt="Pou">
+            </div>
+            <center>
+                <button class="eat">Eat Button</button>
+            </center>
+        </div>
+    </div>
+
+    <script>
+        // --- JavaScript Logic ---
+        const button = document.querySelector('.eat');
+        const pou = document.querySelector('.pou');
+        const food = document.querySelector('.food');
+        
+        let width = 60; // ទំហំដើមរបស់ Pou
+
+        button.addEventListener('click', function() {
+            // បន្ថែមទំហំ Pou ម្តង 10px ពេលចុច
+            width += 10; 
+            
+            // បង្ហាញគំនូរជីវចលចំណីធ្លាក់ចុះ (Food Animation)
+            food.classList.add('show');
+
+            // ទុកពេលឱ្យចំណីធ្លាក់ដល់មាត់ Pou ទើបឱ្យ Pou រីកធំ
+            setTimeout(() => {
+                pou.style.width = width + 'px';
+                food.classList.remove('show');
+            }, 1500); // 1500ms ឬ 1.5 វិនាទី ត្រូវគ្នានឹង Animation របស់ CSS
+        });
+    </script>
+
+</body>
+</html>

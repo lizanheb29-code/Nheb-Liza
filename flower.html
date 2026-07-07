@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Flower Animation</title>
+    <link rel="stylesheet" href="https://rerofya.github.io/resources/flower.css">
+    <link rel="stylesheet" href="style.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background-color: #111a1e;
+            /* ពណ៌ខៀវក្រម៉ៅងងឹតដូចក្នុងវីដេអូ */
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: flex-end;
+            /* ឱ្យផ្កាចាប់ផ្តើមដុះចេញពីផ្នែកខាងក្រោមនៃអេក្រង់ */
+            overflow: hidden;
+            padding-bottom: 50px;
+        }
+
+        #flower-container {
+            width: 100%;
+            max-width: 600px;
+            height: 500px;
+            position: relative;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div id="flower-container"></div>
+
+    <script src="https://rerofya.github.io/resources/flower.js"></script>
+    <script src="script.js"></script>
+    <script>
+        // បញ្ជាឱ្យផ្កាចាប់ផ្តើមដំណើរការនៅពេលដែលទំព័រ Web ដើរពេញលេញ (Loaded)
+        window.addEventListener('DOMContentLoaded', () => {
+            // ប្រសិនបើបណ្ណាល័យរត់បានជោគជ័យ វានឹងបង្កើតចលនាផ្កាដោយស្វ័យប្រវត្តិចូលក្នុង #flower-container
+            console.log("Flower Animation is starting...");
+        });
+    </script>
+</body>
+
+</html>

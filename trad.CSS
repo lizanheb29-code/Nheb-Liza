@@ -1,0 +1,135 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    background-color: #0b0e11;
+    color: #e0e3eb;
+    font-family: 'Inter', sans-serif;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    padding: 20px;
+}
+
+/* Dashboard Container */
+.chart-wrapper {
+    position: relative;
+    width: 100%;
+    max-width: 900px;
+    height: 750px;
+    background-color: #131722;
+    border: 1px solid #2a2e39;
+    border-radius: 8px;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    box-shadow: 0 15px 30px rgba(0, 0, 0, 0.7);
+}
+
+/* Chart Header Navigation Bar */
+.chart-header {
+    height: 48px;
+    background-color: #1c2030;
+    border-bottom: 1px solid #2a2e39;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 16px;
+    z-index: 10;
+}
+
+.pair-info {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.pair-name {
+    font-weight: 700;
+    font-size: 0.95rem;
+    color: #ffffff;
+}
+
+.timeframe {
+    font-size: 0.8rem;
+    color: #848e9c;
+}
+
+.live-price-container {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.live-price {
+    font-family: monospace;
+    font-weight: 700;
+    color: #00ffff;
+    background-color: rgba(0, 255, 255, 0.1);
+    padding: 2px 6px;
+    border-radius: 4px;
+}
+
+.countdown {
+    font-size: 0.8rem;
+    font-family: monospace;
+    color: #848e9c;
+}
+
+/* Interactive Canvas Workspace */
+.canvas-container {
+    flex: 1;
+    position: relative;
+    width: 100%;
+    height: 100%;
+}
+
+canvas {
+    display: block;
+    width: 100%;
+    height: 100%;
+}
+
+/* Text Overlay Branding */
+.chart-watermark {
+    position: absolute;
+    bottom: 40px;
+    left: 50%;
+    transform: translateX(-50%);
+    text-align: center;
+    pointer-events: none;
+    z-index: 5;
+    background: rgba(19, 23, 34, 0.75);
+    padding: 15px 25px;
+    border-radius: 12px;
+    backdrop-filter: blur(4px);
+    border: 1px solid rgba(42, 46, 57, 0.5);
+}
+
+.chart-watermark h2 {
+    font-size: 1.5rem;
+    color: #f0a500;
+    margin-bottom: 4px;
+    letter-spacing: 1px;
+}
+
+.chart-watermark p {
+    font-size: 0.75rem;
+    color: #848e9c;
+    margin-bottom: 8px;
+}
+
+.promo-badge {
+    display: inline-block;
+    font-size: 0.7rem;
+    font-weight: bold;
+    color: #131722;
+    background-color: #ff6b6b;
+    padding: 2px 8px;
+    border-radius: 20px;
+    text-transform: uppercase;
+}

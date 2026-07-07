@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Realistic Fireworks Animation</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background-color: #000;
+            /* ផ្ទៃមេឃងងឹត */
+            overflow: hidden;
+            width: 100vw;
+            height: 100vh;
+        }
+
+        canvas {
+            display: block;
+        }
+    </style>
+</head>
+
+<body>
+    <canvas id="fireworksCanvas"></canvas>
+    <script src="script.js"></script>
+    <script>
+        const canvas = document.getElementById('fireworksCanvas');
+        const ctx = canvas.getContext('2d');
+
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+        resizeCanvas();
+        window.addEventListener('resize', resizeCanvas);
+
+        let fireworks = [];
+
+        // អនុគមន៍បង្កើតពណ៌ចម្រុះដោយចៃដន្យ
+        function randomColor() {
+            const colors = ['#ff3366', '#ff9933', '#ffff33', '#33cc33', '#3399ff', '#9933ff', '#ffffff'];
+            return colors[Math.floor(Math.random() * colors.length)];
+        }
+
+        // អនុគមន៍គណនាការបង្កើតផ្កាភ្លើងជារង្វង់មូល (ដូចក្នុងវីដេអូរបស់អ្នក)
+        function makeFullCircleFirework(fireX, fireY) {
+            const color = randomColor();
+            const velocity = Math.random() * 8 + 8; // ល្បឿនផ្ទុះរាលដាល
+            const max = 120; // ចំនួនភាគល្អិតក្នុងមួយដុំផាវ
+
+            for (let i = 0; i < max; i++) {
+                // គណនាមុំរង្វង់មូល (300 ដឺក្រេ ឬ Math.PI * 2)
+                const rad = (i * Math.PI * 2) / max;
+
+                const firework = {
+                    x: fireX,
+                    y: fireY,
+                    size: Math.random() + 1.5,
+                    fill: color,
+                    // គណនាល្បឿនរត់តាមទិសដៅ X និង Y ផ្អែកលើមុំ Cos និង Sin
+                    vx: Math.cos(rad) * velocity + (Math.random() - 0.5) * 0.5,
+                    vy: Math.sin(rad) * velocity + (Math.random() - 0.5) * 0.5,
+                    ay: 0.06, // កម្លាំងទំនាញដី (ទាញឱ្យធ្លាក់ចុះក្រោមតិចៗ)
+                    alpha: 1, // កម្រិតភាពច្បាស់ (នឹងរលាយបាត់ទៅៗ)
+                    life: Math.round(Math.random() * 40) + 40 // អាយុកាលរបស់ភាគល្អិត
+                };
+
+                fireworks.push(firework);
+            }
+        }
+
+        // ដំណើរការគូរ និងធ្វើបច្ចុប្បន្នភាពចលនា
+        function animate() {
+            // បង្កើត Effect ព្រិលៗនៅខាងក្រោយ (Motion Blur) ដើម្បីឱ្យឃើញកន្ទុយផ្កាភ្លើង
+            ctx.fillStyle = 'rgba(0, 0, 0, 0.15)';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            // បាញ់ផាវចេញមកដោយស្វ័យប្រវត្តិ (ចៃដន្យ)
+            if (Math.random() < 0.04) {
+                const randomX = Math.random() * canvas.width;
+                const randomY = Math.random() * (canvas.height * 0.6) + 100; // ឱ្យផ្ទុះនៅពាក់កណ្តាលអាកាសលើ
+                makeFullCircleFirework(randomX, randomY);
+            }
+
+            // គណនាចលនាភាគល្អិតនីមួយៗ
+            for (let i = fireworks.length - 1; i >= 0; i--) {
+                const f = fireworks[i];
+
+                f.x += f.vx;
+                f.y += f.vy;
+                f.vy += f.ay; // បន្ថែមកម្លាំងទំនាញដីទៅលើល្បឿនអ័ក្ស Y
+                f.alpha -= 0.015; // ឱ្យវារលត់ទៅៗ
+                f.life--;
+
+                // លុបភាគល្អិតណាដែលអស់អាយុកាល ឬមើលលែងឃើញ
+                if (f.life <= 0 || f.alpha <= 0) {
+                    fireworks.splice(i, 1);
+                    continue;
+                }
+
+                // គូរគ្រាប់ផ្កាភ្លើងនៅលើ Canvas
+                ctx.save();
+                ctx.globalAlpha = f.alpha;
+                ctx.shadowBlur = 10; // បន្ថែមពន្លឺ Glow ជុំវិញគ្រាប់ផ្កាភ្លើង
+                ctx.shadowColor = f.fill;
+                ctx.fillStyle = f.fill;
+                ctx.beginPath();
+                ctx.arc(f.x, f.y, f.size, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.restore();
+            }
+
+            requestAnimationFrame(animate);
+        }
+
+        // ចុច Mouse នៅលើអេក្រង់ដើម្បីបាញ់ផាវចំកន្លែងដែលចង់បាន
+        window.addEventListener('click', (e) => {
+            makeFullCircleFirework(e.clientX, e.clientY);
+        });
+
+        // ចាប់ផ្តើមដំណើរការ
+        animate();
+    </script>
+</body>
+
+</html>

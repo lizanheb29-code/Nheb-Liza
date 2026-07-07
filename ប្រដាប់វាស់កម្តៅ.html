@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Glass Thermostat</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        body {
+    margin: 0;
+    height: 100vh;
+    background: #0a0a0a;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.thermostat-container {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    position: relative;
+}
+
+/* បន្ទាត់បន្ទះលេខ (Ruler) */
+.ruler {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    height: 300px;
+    color: #555;
+    font-size: 14px;
+    font-weight: bold;
+    text-align: right;
+    width: 30px;
+}
+
+/* តួកែវទែម៉ូម៉ែត្រ (Thermostat Bar) */
+.thermostat {
+    position: relative;
+    width: 35px;
+    height: 300px;
+    background: rgba(255, 255, 255, 0.03);
+    border: 2px solid rgba(255, 255, 255, 0.1);
+    border-radius: 20px;
+    box-shadow: inset 0 0 15px rgba(0, 0, 0, 0.7), 0 10px 30px rgba(0,0,0,0.5);
+    overflow: hidden;
+    backdrop-filter: blur(5px);
+}
+
+/* របារទឹកពណ៌ខាងក្នុង (Fluid) */
+.fluid-bar {
+    position: absolute;
+    bottom: 0;
+    width: 100%;
+    height: 33.33%; /* តម្លៃដើមសម្រាប់ 70° */
+    background: #00ff66;
+    border-radius: 0 0 20px 20px;
+    box-shadow: 0 0 30px #00ff66;
+    transition: height 0.3s ease, background 0.5s ease, box-shadow 0.5s ease;
+    filter: url(#turbulent-displace); /* ហៅ filter SVG មកប្រើ */
+}
+
+/* ប៊ូតុងរំកិលស្បែកជើង (Invisible Slider for control) */
+#temp-slider {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 300px;
+    height: 35px;
+    transform: rotate(-90deg) translateX(-300px);
+    transform-origin: top left;
+    margin: 0;
+    opacity: 0; /* លាក់របារដើមរបស់ browser ចោល */
+    cursor: pointer;
+    z-index: 10;
+}
+
+/* ផ្នែកបង្ហាញលេខសីតុណ្ហភាពខាងក្រោម */
+.temp-display {
+    position: absolute;
+    bottom: -90px;
+    left: 50%;
+    transform: translateX(-50%);
+    text-align: center;
+    width: 200px;
+}
+
+.temp-display h1 {
+    margin: 0;
+    font-size: 42px;
+    color: #00ff66;
+    text-shadow: 0 0 20px rgba(0, 255, 102, 0.4);
+    transition: color 0.5s ease;
+}
+
+.temp-display p {
+    margin: 5px 0 0;
+    font-size: 12px;
+    letter-spacing: 2px;
+    color: #666;
+    text-transform: uppercase;
+}
+    </style>
+</head>
+<body>
+
+    <svg style="position: absolute; width: 0; height: 0;">
+        <defs>
+            <filter id="turbulent-displace" color-interpolation-filters="sRGB">
+                <feTurbulence type="turbulence" baseFrequency="0.05" numOctaves="2" result="noise" />
+                <feDisplacementMap in="SourceGraphic" in2="noise" scale="2" xChannelSelector="R" yChannelSelector="G" />
+            </filter>
+        </defs>
+    </svg>
+
+    <div class="thermostat-container">
+        <div class="ruler">
+            <span>110</span>
+            <span>100</span>
+            <span>90</span>
+            <span>80</span>
+            <span>70</span>
+            <span>60</span>
+            <span>50</span>
+        </div>
+
+        <div class="thermostat">
+            <input type="range" id="temp-slider" min="50" max="110" value="70">
+            <div class="fluid-bar" id="fluid"></div>
+        </div>
+
+        <div class="temp-display">
+            <h1 id="temp-value">70°</h1>
+            <p id="temp-status">COMFORTABLE</p>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+    <script>
+        const slider = document.getElementById('temp-slider');
+const fluid = document.getElementById('fluid');
+const tempValue = document.getElementById('temp-value');
+const tempStatus = document.getElementById('temp-status');
+
+slider.addEventListener('input', (e) => {
+    const value = parseInt(e.target.value);
+    
+    // គណនាភាគរយនៃកម្ពស់ (ពី 50 ទៅ 110 មានចន្លោះ 60)
+    const percent = ((value - 50) / 60) * 100;
+    fluid.style.height = `${percent}%`;
+    
+    // បង្ហាញលេខនៅលើអេក្រង់
+    tempValue.innerText = `${value}°`;
+
+    // លក្ខខណ្ឌប្តូរពណ៌ និងអក្សរទៅតាមកម្រិតសីតុណ្ហភាព
+    let color = '';
+    let status = '';
+
+    if (value <= 75) {
+        color = '#00ff66'; // ពណ៌បៃតង
+        status = 'COMFORTABLE';
+    } else if (value > 75 && value <= 90) {
+        color = '#ffaa00'; // ពណ៌លឿងទុំ
+        status = 'WARM';
+    } else if (value > 90 && value <= 100) {
+        color = '#ff3300'; // ពណ៌ក្រហមឆ្អៅ
+        status = 'HOT';
+    } else {
+        color = '#ff0055'; // ពណ៌ផ្កាឈូកក្រហម (ខ្លាំង)
+        status = 'EXTREME';
+    }
+
+    // ដាក់បញ្ចូលពណ៌ទៅក្នុង Style
+    fluid.style.background = color;
+    fluid.style.boxShadow = `0 0 30px ${color}`;
+    tempValue.style.color = color;
+    tempValue.style.textShadow = `0 0 20px ${color}66`;
+    tempStatus.innerText = status;
+});
+    </script>
+</body>
+</html>

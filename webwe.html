@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Heart Shape Animation</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background-color: #000;
+            overflow: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        canvas {
+            display: block;
+        }
+    </style>
+</head>
+
+<body>
+    <canvas id="heartCanvas"></canvas>
+    <script src="script.js"></script>
+    <script>
+        const canvas = document.getElementById('heartCanvas');
+        const ctx = canvas.getContext('2d');
+
+        // កំណត់ទំហំ Canvas ឱ្យពេញអេក្រង់
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+        resizeCanvas();
+        window.addEventListener('resize', resizeCanvas);
+
+        let pulseTime = 0;
+
+        function generateHeartShape() {
+            const heartPoints = [];
+            const centerX = canvas.width / 2;
+            const centerY = canvas.height / 2;
+
+            // គណនាចលនា Pulse (លោតញាប់ៗដូចបេះដូង)
+            const pulse = 1 + Math.sin(pulseTime) * 0.05;
+            // បើចង់បានបេះដូងធំជាងនេះ អាចដំឡើងលេខ 15 ទៅ 20 ឬ 25 បាន
+            const scale = 15 * pulse;
+
+            // កំណត់ចំនួនចំណុច (កាន់តែច្រើន កាន់តែម៉ដ្ត)
+            const steps = 180;
+
+            for (let i = 0; i < steps; i++) {
+                const t = (i / steps) * Math.PI * 2;
+
+                // រូបមន្តគណិតវិទ្យាសម្រាប់គូររូបបេះដូង (ដូចក្នុងរូបភាពរបស់អ្នក)
+                const x = centerX + scale * 16 * Math.pow(Math.sin(t), 3);
+                const y = centerY - scale * (13 * Math.cos(t) - 5 * Math.cos(2 * t) - 2 * Math.cos(3 * t) - Math.cos(4 * t));
+
+                heartPoints.push({ x, y });
+            }
+            return heartPoints;
+        }
+
+        function animate() {
+            // បង្កើត Effect ព្រិលៗនៅខាងក្រោយ (Trail Effect) ដោយការលាបពណ៌ខ្មៅស្រាលៗ
+            ctx.fillStyle = 'rgba(0, 0, 0, 0.05)';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            const points = generateHeartShape();
+
+            // គូរខ្សែភ្ជាប់គ្នាចេញជារូបរាងបេះដូង
+            ctx.beginPath();
+            ctx.strokeStyle = 'rgba(255, 255, 255, 0.6)'; // ពណ៌សមានកម្រិតភាពច្បាស់ 60%
+            ctx.lineWidth = 1;
+
+            // ដើម្បីឱ្យចេញសរសៃខ្វាត់ខ្វែងដូចរូបភាព យើងអាចគូសភ្ជាប់ចំណុចមិនរៀបរយ ឬគូសពីចំណុចមួយទៅចំណុចមួយទៀត
+            for (let i = 0; i < points.length; i++) {
+                // អ្នកអាចប្តូរលេខ i + 1 ទៅជាការលោតរំលងចំណុច (ឧទាហរណ៍៖ (i + 50) % points.length) ដើម្បីឱ្យខ្វាត់ខ្វែងខ្លាំង
+                let nextIndex = (i + 1) % points.length;
+
+                ctx.moveTo(points[i].x, points[i].y);
+                ctx.lineTo(points[nextIndex].x, points[nextIndex].y);
+
+                // បន្ថែមខ្សែខ្វាត់ខ្វែងទៅចំកណ្តាល ឬចំណុចទល់មុខ (បង្កើតសរសៃអំបោះ)
+                let crossIndex = (i + Math.floor(points.length / 2)) % points.length;
+                if (i % 2 === 0) { // គូរតែចំណុចខ្លះៗដើម្បីកុំឱ្យណែនពេក
+                    ctx.moveTo(points[i].x, points[i].y);
+                    ctx.lineTo(points[crossIndex].x, points[crossIndex].y);
+                }
+            }
+            ctx.stroke();
+
+            // បង្កើនល្បឿនចលនា Pulse
+            pulseTime += 0.1;
+
+            requestAnimationFrame(animate);
+        }
+
+        // ចាប់ផ្តើមដំណើរការ Animation
+        animate();
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body {
+            margin: 0;
+            height: 100vh;
+            background: #000;
+            display: grid;
+            place-items: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .radar {
+            position: relative;
+            width: 20px;
+            height: 20px;
+            background: #00ff41;
+            border-radius: 50%;
+            box-shadow: 0 0 10px #00ff41;
+        }
+
+        .radar::before,
+        .radar::after {
+            content: '';
+            position: absolute;
+            inset: -20px;
+            border: 2px solid #00ff41;
+            border-radius: 50%;
+            opacity: 0;
+            animation: pulse 2s linear infinite;
+        }
+
+        .radar::after {
+            animation-delay: 1s;
+        }
+
+        @keyframes pulse {
+            0% {
+                transform: scale(0.5);
+                opacity: 1;
+            }
+
+            100% {
+                transform: scale(4);
+                opacity: 0;
+            }
+        }
+
+        /* --- កូដយន្តហោះដែលបានកែសម្រួលដាច់ស្រឡះ --- */
+        .plane {
+            position: absolute;
+            color: #00ff41;
+            font-size: 30px;
+            top: 50%;
+            /* មិនបាច់ដាក់ transform ត្រង់នេះទេ ព្រោះវាត្រូវយកទៅដាក់ក្នុង keyframes វិញ */
+            animation: flyPass 5s linear infinite;
+        }
+
+        @keyframes flyPass {
+            0% {
+                left: -50px;
+                /* រក្សាទីតាំងកណ្តាលកម្ពស់ (translateY) និង បង្វិលក្បាលទៅមុខ (rotate) */
+                transform: translateY(-50%) rotate(90deg);
+            }
+
+            100% {
+                left: 100%;
+                /* រក្សាមុំដដែលរហូតដល់ហោះផុតអេក្រង់ */
+                transform: translateY(-50%) rotate(90deg);
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="radar"></div>
+    <i class="fa-solid fa-plane plane"></i>
+</body>
+
+</html>

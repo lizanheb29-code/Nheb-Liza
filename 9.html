@@ -1,0 +1,807 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Multi-Agent AI Systems — techwarelab</title>
+    <style>
+        :root {
+            --bg-deep: #050912;
+            --bg-navy: #0a1330;
+            --panel: #0d1a3d;
+            --cyan: #37e8d8;
+            --pink: #ff5fb0;
+            --blue: #2f7bff;
+            --amber: #ffb133;
+            --ice: #eaf2ff;
+            --muted: #8ea2c9;
+            --line: #1b2c5c;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        html,
+        body {
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background:
+                radial-gradient(ellipse at 80% 0%, rgba(47, 123, 255, 0.18), transparent 55%),
+                radial-gradient(ellipse at 15% 15%, rgba(55, 232, 216, 0.08), transparent 40%),
+                linear-gradient(180deg, var(--bg-deep), var(--bg-navy) 40%, var(--bg-deep));
+            font-family: 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
+            color: var(--ice);
+            overflow-x: hidden;
+        }
+
+        .page {
+            max-width: 760px;
+            margin: 0 auto;
+            padding: 44px 40px 30px;
+            position: relative;
+        }
+
+        /* diagonal light beam like reference */
+        .beam {
+            position: absolute;
+            top: -10%;
+            right: -10%;
+            width: 420px;
+            height: 600px;
+            background: linear-gradient(120deg, rgba(47, 123, 255, 0.16), transparent 60%);
+            transform: rotate(15deg);
+            filter: blur(10px);
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        /* header */
+        .brand {
+            position: relative;
+            z-index: 2;
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            gap: 10px;
+            margin-bottom: 34px;
+        }
+
+        .brand .mark {
+            width: 30px;
+            height: 30px;
+            border-radius: 8px;
+            background: linear-gradient(135deg, #ff5fb0, #ffb133 50%, #2f7bff);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 800;
+            color: #fff;
+            font-size: 16px;
+        }
+
+        .brand .word {
+            font-weight: 600;
+            font-size: 18px;
+            letter-spacing: 0.3px;
+            color: var(--ice);
+        }
+
+        h1 {
+            position: relative;
+            z-index: 2;
+            font-size: 44px;
+            line-height: 1.08;
+            font-weight: 800;
+            margin: 0 0 6px;
+            letter-spacing: -0.5px;
+        }
+
+        h1 .accent {
+            background: linear-gradient(90deg, var(--blue), var(--cyan));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+
+        h1 .thin {
+            font-weight: 400;
+            font-size: 34px;
+            display: block;
+            color: #dfe7f7;
+        }
+
+        .rule {
+            width: 70px;
+            height: 3px;
+            margin: 18px 0 40px;
+            background: linear-gradient(90deg, var(--cyan), transparent);
+            position: relative;
+            z-index: 2;
+        }
+
+        /* diagram */
+        .diagram {
+            position: relative;
+            width: 100%;
+            max-width: 640px;
+            aspect-ratio: 1 / 0.92;
+            margin: 0 auto 46px;
+            z-index: 2;
+        }
+
+        .hub {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            background: radial-gradient(circle at 50% 40%, rgba(47, 123, 255, 0.25), rgba(6, 12, 30, 0.9) 70%);
+            border: 1px solid rgba(90, 150, 255, 0.35);
+            box-shadow: 0 0 40px rgba(47, 123, 255, 0.35), inset 0 0 30px rgba(47, 123, 255, 0.2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            animation: pulseHub 3.5s ease-in-out infinite;
+        }
+
+        @keyframes pulseHub {
+
+            0%,
+            100% {
+                box-shadow: 0 0 40px rgba(47, 123, 255, 0.35), inset 0 0 30px rgba(47, 123, 255, 0.2);
+            }
+
+            50% {
+                box-shadow: 0 0 60px rgba(55, 232, 216, 0.45), inset 0 0 34px rgba(55, 232, 216, 0.25);
+            }
+        }
+
+        .hub span {
+            font-size: 12.5px;
+            font-weight: 700;
+            letter-spacing: 0.6px;
+            line-height: 1.6;
+            color: #dcefff;
+        }
+
+        .orbit-dots {
+            position: absolute;
+            inset: 0;
+        }
+
+        .orbit-dots svg {
+            width: 100%;
+            height: 100%;
+        }
+
+        .dash {
+            stroke: rgba(120, 170, 255, 0.55);
+            stroke-width: 1.6;
+            stroke-dasharray: 4 7;
+            fill: none;
+            animation: dashMove 3s linear infinite;
+        }
+
+        @keyframes dashMove {
+            to {
+                stroke-dashoffset: -40;
+            }
+        }
+
+        .node {
+            position: absolute;
+            width: 190px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+        }
+
+        .node.tl {
+            top: 0%;
+            left: 2%;
+        }
+
+        .node.tr {
+            top: 0%;
+            right: 2%;
+        }
+
+        .node.bl {
+            bottom: 0%;
+            left: 2%;
+        }
+
+        .node.br {
+            bottom: 0%;
+            right: 2%;
+        }
+
+        .bot {
+            width: 96px;
+            height: 112px;
+            position: relative;
+            margin-bottom: 10px;
+            filter: drop-shadow(0 10px 18px rgba(0, 0, 0, 0.5));
+            animation: float 4.5s ease-in-out infinite;
+        }
+
+        .node.tr .bot {
+            animation-delay: .3s;
+        }
+
+        .node.bl .bot {
+            animation-delay: .6s;
+        }
+
+        .node.br .bot {
+            animation-delay: .9s;
+        }
+
+        @keyframes float {
+
+            0%,
+            100% {
+                transform: translateY(0px);
+            }
+
+            50% {
+                transform: translateY(-8px);
+            }
+        }
+
+        .bot .pad {
+            position: absolute;
+            bottom: -6px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 80px;
+            height: 14px;
+            border-radius: 50%;
+            background: radial-gradient(ellipse at center, rgba(120, 170, 255, 0.35), transparent 70%);
+        }
+
+        .bot .head {
+            width: 66px;
+            height: 56px;
+            border-radius: 26px 26px 30px 30px;
+            margin: 0 auto;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .bot .antenna {
+            position: absolute;
+            top: -14px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 3px;
+            height: 14px;
+            background: currentColor;
+            border-radius: 2px;
+        }
+
+        .bot .antenna::after {
+            content: '';
+            position: absolute;
+            top: -5px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: currentColor;
+            box-shadow: 0 0 8px currentColor;
+        }
+
+        .bot .eye {
+            width: 15px;
+            height: 20px;
+            border-radius: 8px;
+            background: #0b1330;
+            box-shadow: inset 0 0 8px rgba(0, 0, 0, 0.6);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .bot .eye::after {
+            content: '';
+            width: 7px;
+            height: 9px;
+            border-radius: 4px;
+            background: currentColor;
+            box-shadow: 0 0 10px currentColor;
+        }
+
+        .bot .ear {
+            position: absolute;
+            top: 14px;
+            width: 10px;
+            height: 20px;
+            border-radius: 5px;
+            background: currentColor;
+            opacity: 0.85;
+        }
+
+        .bot .ear.l {
+            left: -8px;
+        }
+
+        .bot .ear.r {
+            right: -8px;
+        }
+
+        .bot .torso {
+            width: 54px;
+            height: 42px;
+            margin: 2px auto 0;
+            border-radius: 16px;
+        }
+
+        .bot .arm {
+            position: absolute;
+            top: 60px;
+            width: 9px;
+            height: 26px;
+            border-radius: 5px;
+            background: currentColor;
+            opacity: 0.9;
+            transform-origin: top center;
+        }
+
+        .bot .arm.l {
+            left: 6px;
+            transform: rotate(18deg);
+        }
+
+        .bot .arm.r {
+            right: 6px;
+            transform: rotate(-18deg);
+        }
+
+        .bot .leg {
+            position: absolute;
+            bottom: 0;
+            width: 11px;
+            height: 20px;
+            border-radius: 5px;
+            background: currentColor;
+            opacity: 0.9;
+        }
+
+        .bot .leg.l {
+            left: 26px;
+        }
+
+        .bot .leg.r {
+            right: 26px;
+        }
+
+        .bot.teal {
+            color: var(--cyan);
+        }
+
+        .bot.teal .head,
+        .bot.teal .torso {
+            background: linear-gradient(160deg, #4de9d8, #1aa896);
+        }
+
+        .bot.pink {
+            color: var(--pink);
+        }
+
+        .bot.pink .head,
+        .bot.pink .torso {
+            background: linear-gradient(160deg, #ff86c9, #e73f96);
+        }
+
+        .bot.blue {
+            color: #8fb8ff;
+        }
+
+        .bot.blue .head,
+        .bot.blue .torso {
+            background: linear-gradient(160deg, #5a8fff, #2c5fd8);
+        }
+
+        .bot.amber {
+            color: #ffe1a3;
+        }
+
+        .bot.amber .head,
+        .bot.amber .torso {
+            background: linear-gradient(160deg, #ffcf5c, #e69a1a);
+        }
+
+        .node .tag-row {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 6px;
+        }
+
+        .node.tl .tag-row,
+        .node.bl .tag-row {
+            flex-direction: row;
+        }
+
+        .node.tr .tag-row,
+        .node.br .tag-row {
+            flex-direction: row-reverse;
+        }
+
+        .icon-chip {
+            width: 38px;
+            height: 38px;
+            border-radius: 10px;
+            background: rgba(20, 32, 66, 0.9);
+            border: 1px solid var(--line);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .icon-chip svg {
+            width: 20px;
+            height: 20px;
+        }
+
+        .node .label {
+            font-size: 13px;
+            font-weight: 800;
+            letter-spacing: 1px;
+        }
+
+        .node .desc {
+            font-size: 12px;
+            color: var(--muted);
+            line-height: 1.45;
+            max-width: 150px;
+        }
+
+        .node.tl .label,
+        .node.tl .icon-chip svg {
+            color: var(--cyan);
+        }
+
+        .node.tr .label,
+        .node.tr .icon-chip svg {
+            color: var(--pink);
+        }
+
+        .node.bl .label,
+        .node.bl .icon-chip svg {
+            color: #5a9bff;
+        }
+
+        .node.br .label,
+        .node.br .icon-chip svg {
+            color: var(--amber);
+        }
+
+        .node.tl,
+        .node.bl {
+            align-items: flex-start;
+            text-align: left;
+        }
+
+        .node.tr,
+        .node.br {
+            align-items: flex-end;
+            text-align: right;
+        }
+
+        /* footer strip */
+        .divider {
+            height: 1px;
+            background: var(--line);
+            margin: 6px 0 30px;
+            position: relative;
+            z-index: 2;
+        }
+
+        .footer {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 20px;
+            position: relative;
+            z-index: 2;
+        }
+
+        .foot-item {
+            text-align: left;
+        }
+
+        .foot-icon {
+            width: 44px;
+            height: 44px;
+            border-radius: 12px;
+            background: rgba(20, 32, 66, 0.7);
+            border: 1px solid var(--line);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 12px;
+        }
+
+        .foot-icon svg {
+            width: 22px;
+            height: 22px;
+            color: #3aa0ff;
+        }
+
+        .foot-item h3 {
+            font-size: 12.5px;
+            letter-spacing: 0.6px;
+            margin: 0 0 6px;
+            color: #4fb2ff;
+            font-weight: 800;
+        }
+
+        .foot-item p {
+            font-size: 12.5px;
+            color: var(--muted);
+            line-height: 1.5;
+            margin: 0;
+        }
+
+        @media (max-width:640px) {
+            .page {
+                padding: 30px 20px;
+            }
+
+            h1 {
+                font-size: 32px;
+            }
+
+            h1 .thin {
+                font-size: 24px;
+            }
+
+            .diagram {
+                aspect-ratio: 1/1.5;
+            }
+
+            .node {
+                width: 150px;
+                position: static;
+                margin-bottom: 26px;
+            }
+
+            .diagram {
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                gap: 0;
+                height: auto;
+            }
+
+            .hub {
+                position: static;
+                transform: none;
+                order: 2;
+                margin: 10px 0 26px;
+            }
+
+            .orbit-dots {
+                display: none;
+            }
+
+            .node.tl,
+            .node.tr,
+            .node.bl,
+            .node.br {
+                align-items: center;
+                text-align: center;
+            }
+
+            .node.tr .tag-row,
+            .node.br .tag-row {
+                flex-direction: row;
+            }
+
+            .footer {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+
+            .bot,
+            .hub {
+                animation: none !important;
+            }
+
+            .dash {
+                animation: none !important;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="page">
+        <div class="beam"></div>
+
+        <div class="brand">
+            <div class="mark">T</div>
+            <div class="word">techwarelab</div>
+        </div>
+
+        <h1>
+            Multi-Agent<br>AI Systems:
+            <span class="thin"><span class="accent">The Future of<br>Collaborative Intelligence</span></span>
+            <span class="thin">for Enterprises</span>
+        </h1>
+        <div class="rule"></div>
+
+        <div class="diagram">
+            <div class="orbit-dots">
+                <svg viewBox="0 0 640 590" preserveAspectRatio="none">
+                    <path class="dash" d="M170,120 L300,255"></path>
+                    <path class="dash" d="M470,120 L340,255"></path>
+                    <path class="dash" d="M170,470 L300,335"></path>
+                    <path class="dash" d="M470,470 L340,335"></path>
+                </svg>
+            </div>
+
+            <div class="hub"><span>COLLABORATE.<br>AUTOMATE.<br>ACCELERATE.</span></div>
+
+            <div class="node tl">
+                <div class="bot teal">
+                    <div class="head">
+                        <div class="antenna"></div>
+                        <div class="ear l"></div>
+                        <div class="ear r"></div>
+                        <div class="eye"></div>
+                        <div class="eye"></div>
+                    </div>
+                    <div class="torso"></div>
+                    <div class="arm l"></div>
+                    <div class="arm r"></div>
+                    <div class="leg l"></div>
+                    <div class="leg r"></div>
+                    <div class="pad"></div>
+                </div>
+                <div class="tag-row">
+                    <div class="icon-chip"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M4 20V10M11 20V4M18 20v-7" />
+                        </svg></div>
+                </div>
+                <div class="label">ANALYZE</div>
+                <div class="desc">Extract insights from data</div>
+            </div>
+
+            <div class="node tr">
+                <div class="bot pink">
+                    <div class="head">
+                        <div class="antenna"></div>
+                        <div class="ear l"></div>
+                        <div class="ear r"></div>
+                        <div class="eye"></div>
+                        <div class="eye"></div>
+                    </div>
+                    <div class="torso"></div>
+                    <div class="arm l"></div>
+                    <div class="arm r"></div>
+                    <div class="leg l"></div>
+                    <div class="leg r"></div>
+                    <div class="pad"></div>
+                </div>
+                <div class="tag-row">
+                    <div class="icon-chip"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M21 11.5a8.38 8.38 0 01-9 8.4A9 9 0 013 12a9 9 0 019-8.4 8.38 8.38 0 019 7.9z" />
+                        </svg></div>
+                </div>
+                <div class="label">COMMUNICATE</div>
+                <div class="desc">Share information and collaborate</div>
+            </div>
+
+            <div class="node bl">
+                <div class="bot blue">
+                    <div class="head">
+                        <div class="antenna"></div>
+                        <div class="ear l"></div>
+                        <div class="ear r"></div>
+                        <div class="eye"></div>
+                        <div class="eye"></div>
+                    </div>
+                    <div class="torso"></div>
+                    <div class="arm l"></div>
+                    <div class="arm r"></div>
+                    <div class="leg l"></div>
+                    <div class="leg r"></div>
+                    <div class="pad"></div>
+                </div>
+                <div class="tag-row">
+                    <div class="icon-chip"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path
+                                d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2M9 14l2 2 4-4" />
+                        </svg></div>
+                </div>
+                <div class="label">PLAN</div>
+                <div class="desc">Break down goals and assign tasks</div>
+            </div>
+
+            <div class="node br">
+                <div class="bot amber">
+                    <div class="head">
+                        <div class="antenna"></div>
+                        <div class="ear l"></div>
+                        <div class="ear r"></div>
+                        <div class="eye"></div>
+                        <div class="eye"></div>
+                    </div>
+                    <div class="torso"></div>
+                    <div class="arm l"></div>
+                    <div class="arm r"></div>
+                    <div class="leg l"></div>
+                    <div class="leg r"></div>
+                    <div class="pad"></div>
+                </div>
+                <div class="tag-row">
+                    <div class="icon-chip"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <circle cx="12" cy="12" r="3" />
+                            <path
+                                d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 11-2.83 2.83l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 11-2.83-2.83l.06-.06A1.65 1.65 0 004.6 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 112.83-2.83l.06.06A1.65 1.65 0 009 4.6a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 112.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z" />
+                        </svg></div>
+                </div>
+                <div class="label">EXECUTE</div>
+                <div class="desc">Automate tasks and workflows</div>
+            </div>
+        </div>
+
+        <div class="divider"></div>
+
+        <div class="footer">
+            <div class="foot-item">
+                <div class="foot-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M12 2l8 4v6c0 5-3.5 8.5-8 10-4.5-1.5-8-5-8-10V6l8-4z" />
+                        <path d="M9 12l2 2 4-4" />
+                    </svg></div>
+                <h3>SMARTER DECISIONS</h3>
+                <p>Real-time insights and data-driven intelligence.</p>
+            </div>
+            <div class="foot-item">
+                <div class="foot-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="9" cy="8" r="3" />
+                        <path d="M2 21v-1a5 5 0 015-5h4a5 5 0 015 5v1" />
+                        <circle cx="18" cy="9" r="2.2" />
+                        <path d="M22 21v-.8a3.6 3.6 0 00-2.6-3.5" />
+                    </svg></div>
+                <h3>HIGHER EFFICIENCY</h3>
+                <p>Automate, optimize and accelerate business processes.</p>
+            </div>
+            <div class="foot-item">
+                <div class="foot-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <rect x="5" y="11" width="14" height="10" rx="2" />
+                        <path d="M8 11V7a4 4 0 018 0v4" />
+                    </svg></div>
+                <h3>SCALABLE &amp; SECURE</h3>
+                <p>Built for enterprise scale with security and governance.</p>
+            </div>
+            <div class="foot-item">
+                <div class="foot-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M3 17l6-6 4 4 8-8" />
+                        <path d="M21 7v6h-6" />
+                    </svg></div>
+                <h3>DRIVE BETTER OUTCOMES</h3>
+                <p>Boost productivity, innovation, and business growth.</p>
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>

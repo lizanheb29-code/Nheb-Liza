@@ -1,0 +1,175 @@
+[6/28/2026 7:31 PM] Liza Nheb(Spritedekza):
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interactive Glowing Particles</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background-color: #050510;
+            overflow: hidden;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        /* ផ្ទាំងអក្សរពីលើ */
+        .title-container {
+            position: absolute;
+            top: 10%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+            z-index: 10;
+            pointer-events: none;
+        }
+
+        h1 {
+            color: #ffffff;
+            font-size: 2.5rem;
+            letter-spacing: 5px;
+            text-shadow: 0 0 20px rgba(0, 238, 255, 0.6);
+            margin-bottom: 10px;
+        }
+
+        p {
+            color: #8a99ad;
+            font-size: 1rem;
+        }
+
+        canvas {
+            display: block;
+            position: absolute;
+            top: 0;
+            left: 0;
+            z-index: 1;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="title-container">
+        <h1>I LOVE YOU</h1>
+        <p>Move your mouse around or click to send hearts ✨</p>
+    </div>
+
+    <canvas id="particleCanvas"></canvas>
+
+    <script>
+        const canvas = document.getElementById('particleCanvas');
+        const ctx = canvas.getContext('2d');
+
+        // កំណត់ទំហំ Canvas ឲ្យពេញអេក្រង់
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+        resizeCanvas();
+        window.addEventListener('resize', resizeCanvas);
+
+        const particles = [];
+        const mouse = {
+            x: null,
+            y: null
+        };
+
+        // ចាប់យកបម្លាស់ទីរបស់ Mouse
+        window.addEventListener('mousemove', (e) => {
+            mouse.x = e.x;
+            mouse.y = e.y;
+
+            // បង្កើតភាគល្អិតពន្លឺពេលកម្រើក Mouse
+            for (let i = 0; i < 3; i++) {
+                particles.push(new Particle(mouse.x, mouse.y, false));
+            }
+        });
+
+        // បង្កើតរូបបេះដូងពេល Click Mouse
+        window.addEventListener('click', (e) => {
+            // បង្កើតភាគល្អិតរត់ចេញជារូបរាងបេះដូង
+            for (let angle = 0; angle < Math.PI * 2; angle += 0.05) {
+                particles.push(new Particle(e.x, e.y, true, angle));
+            }
+        });
+
+        // Class សម្រាប់គ្រប់គ្រង Particle នីមួយៗ
+        class Particle {
+            constructor(x, y, isHeart, angle = 0) {
+                this.x = x;
+                this.y = y;
+                this.isHeart = isHeart;
+
+                // ពណ៌ចម្រុះបែប Neon (ខៀវ និង បៃតង ដូចក្នុងវីដេអូ)
+                const colors = ['#00e5ff', '#00ffaa', '#7bf1a8', '#b3e5fc'];
+                this.color = colors[Math.floor(Math.random() * colors.length)];
+
+                if (this.isHeart) {
+                    // រូបមន្តគណនារាងបេះដូង
+                    this.size = Math.random() * 2 + 2;
+                    const speedMultiplier = Math.random() * 3 + 2;
+                    this.speedX = (16 * Math.pow(Math.sin(angle), 3)) / 16 * speedMultiplier;
+                    this.speedY = -(13 * Math.cos(angle) - 5 * Math.cos(2 * angle) - 2 * Math.cos(3 * angle) - Math.cos(4 * angle)) / 16 * speedMultiplier;
+                    this.life = 100; // អាយុកាលគ្រាប់ពន្លឺ
+                } else {
+                    // រត់ធម្មតាតាម Mouse
+                    this.size = Math.random() * 3 + 1;
+                    this.speedX = (Math.random() - 0.5) * 2;
+                    this.speedY = (Math.random() - 0.5) * 2;
+                    this.life = Math.random() * 60 + 40;
+                }
+
+                this.maxLife = this.life;
+            }
+            update() {
+                this.x += this.speedX;
+                this.y += this.speedY;
+                this.life--;
+
+                // បន្ថយទំហំតាមអាយុកាល
+                if (this.size > 0.1) this.size -= 0.02;
+            }
+
+            draw() {
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                ctx.fillStyle = this.color;
+
+                // បន្ថែមពន្លឺ Glow ជុំវិញគ្រាប់នីមួយៗ
+                ctx.shadowBlur = 15;
+                ctx.shadowColor = this.color;
+
+                ctx.fill();
+            }
+        }
+
+        // រៀបចំដំណើរការ Dynamic Animation
+        function animate() {
+            // បង្កើត Effect ព្រាលៗនៅខាងក្រោយ (Trail Effect)
+            ctx.fillStyle = 'rgba(5, 5, 16, 0.1)';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            for (let i = 0; i < particles.length; i++) {
+                particles[i].update();
+                particles[i].draw();
+
+                // លុប Particle ណាដែលអស់ជីវិតចោល
+                if (particles[i].life <= 0 || particles[i].size <= 0.1) {
+                    particles.splice(i, 1);
+                    i--;
+                }
+            }
+            requestAnimationFrame(animate);
+        }
+
+        animate();
+    </script>
+</body>
+
+</html>

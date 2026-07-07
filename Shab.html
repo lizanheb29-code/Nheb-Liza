@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interactive Orca Whale Animation</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            width: 100vw;
+            height: 100vh;
+            overflow: hidden;
+            background-color: #e0e0e0;
+            /* ពណ៌ផ្ទៃខាងក្រោយដូចក្នុងវីដេអូ */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: crosshair;
+            /* ប្ដូររូបរាងកណ្ដុរ */
+        }
+
+        canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            display: block;
+        }
+    </style>
+</head>
+
+<body>
+
+    <canvas id="whaleCanvas"></canvas>
+
+    <script src="script.js"></script>
+    <script>
+        const canvas = document.getElementById("whaleCanvas");
+        const ctx = canvas.getContext("2d");
+
+        // កំណត់ទំហំ Canvas ឱ្យពេញអេក្រង់
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+        window.addEventListener("resize", resizeCanvas);
+        resizeCanvas();
+
+        // ទិន្នន័យទីតាំងកណ្ដុរ (Mouse Position)
+        const mouse = {
+            x: window.innerWidth / 2,
+            y: window.innerHeight / 2
+        };
+
+        window.addEventListener("mousemove", (e) => {
+            mouse.x = e.clientX;
+            mouse.y = e.clientY;
+        });
+
+        // រចនាសម្ព័ន្ធរបស់ត្រីបាឡែន (Whale Structure)
+        class Whale {
+            constructor() {
+                this.x = window.innerWidth / 2;
+                this.y = window.innerHeight / 2;
+                this.angle = 0;
+                this.fps = 30;
+                this.easy = 6; // ល្បឿនដេញតាម (Easing) ដូចក្នុងវីដេអូ
+                this.maxSpeed = 15;
+
+                // កំណត់កង់ ឬកង់សន្លាក់របស់ខ្លួនត្រី (Segments)
+                this.numSegments = 12;
+                this.segments = [];
+                for (let i = 0; i < this.numSegments; i++) {
+                    this.segments.push({
+                        x: this.x,
+                        y: this.y,
+                        radius: 30 - (i * 2) // កន្ទុយរួមតូចទៅៗ
+                    });
+                }
+            }
+
+            update() {
+                // គណនាឱ្យក្បាលត្រីដេញតាមកណ្ដុរដោយទន់ភ្លន់
+                let dx = mouse.x - this.x;
+                let dy = mouse.y - this.y;
+                this.angle = Math.atan2(dy, dx);
+
+                this.x += dx / this.easy;
+                this.y += dy / this.easy;
+
+                // បច្ចុប្បន្នភាពផ្នែកផ្សេងៗនៃខ្លួន (Inverse Kinematics)
+                this.segments[0].x = this.x;
+                this.segments[0].y = this.y;
+
+                for (let i = 1; i < this.numSegments; i++) {
+                    let prev = this.segments[i - 1];
+                    let curr = this.segments[i];
+
+                    let sDx = prev.x - curr.x;
+                    let sDy = prev.y - curr.y;
+                    let dist = Math.sqrt(sDx * sDx + sDy * sDy);
+                    let minDist = 15; // ចម្ងាយរវាងសន្លាក់នីមួយៗ
+
+                    if (dist > minDist) {
+                        let angle = Math.atan2(sDy, sDx);
+                        curr.x = prev.x - Math.cos(angle) * minDist;
+                        curr.y = prev.y - Math.sin(angle) * minDist;
+                    }
+                }
+            }
+
+            draw() {
+                // គូររូបរាងត្រីបាឡែន (ខ្មៅ និង ស)
+                ctx.save();
+
+                // គូរព្រុយចំហៀង និងកន្ទុយ (សាមញ្ញ)
+                this.drawFins();
+
+                // គូរខ្លួនត្រីដោយតភ្ជាប់ពីសន្លាក់មួយទៅសន្លាក់មួយ
+                ctx.fillStyle = "#1a1a1a"; // ពណ៌ខ្មៅនៃខ្លួនត្រី
+                for (let i = 0; i < this.numSegments; i++) {
+                    let seg = this.segments[i];
+                    ctx.beginPath();
+                    ctx.arc(seg.x, seg.y, seg.radius, 0, Math.PI * 2);
+                    ctx.fill();
+                }
+
+                // គូរពោះពណ៌ស (White Belly Patch)
+                ctx.fillStyle = "#ffffff";
+                for (let i = 0; i < this.numSegments - 4; i++) {
+                    let seg = this.segments[i];
+                    ctx.beginPath();
+                    ctx.arc(seg.x, seg.y, seg.radius * 0.6, 0, Math.PI * 2);
+                    ctx.fill();
+                }
+
+                ctx.restore();
+            }
+
+            drawFins() {
+                // គូរព្រុយឆ្វេងស្តាំ ដោយផ្អែកលើមុំក្បាលត្រី
+                let head = this.segments[0];
+                ctx.fillStyle = "#1a1a1a";
+
+                // ព្រុយឆ្វេង
+                ctx.beginPath();
+                ctx.arc(head.x + Math.cos(this.angle + Math.PI / 2) * 25, head.y + Math.sin(this.angle + Math.PI / 2) * 25, 12, 0, Math.PI * 2);
+                ctx.fill();
+
+                // ព្រុយស្តាំ
+                ctx.beginPath();
+                ctx.arc(head.x + Math.cos(this.angle - Math.PI / 2) * 25, head.y + Math.sin(this.angle - Math.PI / 2) * 25, 12, 0, Math.PI * 2);
+                ctx.fill();
+            }
+        }
+
+        // បង្កើត Object ត្រីបាឡែន
+        const orca = new Whale();
+
+        // ដំណើរការ Loop គំនូរជីវចល (Animation Loop)
+        function animate() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            orca.update();
+            orca.draw();
+
+            requestAnimationFrame(animate);
+        }
+
+        // ចាប់ផ្ដើមលេង
+        animate();
+    </script>
+</body>
+
+</html>

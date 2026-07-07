@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Google Dino Game</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            width: 100%;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-color: #f7f7f7;
+            font-family: Arial, sans-serif;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 600px;
+            height: 200px;
+        }
+
+        .card {
+            width: 100%;
+            height: 100%;
+            border-bottom: 2px solid #535353;
+            position: relative;
+            overflow: hidden;
+        }
+
+        #dino {
+            width: 50px;
+            height: 50px;
+            position: absolute;
+            bottom: 0;
+            left: 50px;
+        }
+
+        /* បន្ថែម Class នេះពេលដាយណូស័រលោត */
+        .jump {
+            animation: dinoJump 0.5s linear;
+        }
+
+        #kaktus {
+            width: 25px;
+            height: 50px;
+            position: absolute;
+            bottom: 0;
+            right: -30px;
+        }
+
+        /* បន្ថែម Class នេះដើម្បីឱ្យដើមដំបងយក្សរត់ពីស្តាំទៅឆ្វេង */
+        .kaktus-move {
+            animation: kaktusRun 1.5s linear infinite;
+        }
+
+        #startBtn {
+            position: absolute;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            padding: 8px 16px;
+            cursor: pointer;
+            background-color: #535353;
+            color: white;
+            border: none;
+            border-radius: 4px;
+        }
+
+        /* គន្លងចលនាលោតរបស់ដាយណូស័រ */
+        @keyframes dinoJump {
+            0% {
+                bottom: 0;
+            }
+
+            50% {
+                bottom: 80px;
+            }
+
+            100% {
+                bottom: 0;
+            }
+        }
+
+        /* គន្លងចលនារត់របស់ដើមដំបងយក្ស */
+        @keyframes kaktusRun {
+            0% {
+                right: -30px;
+            }
+
+            100% {
+                right: 100%;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="card">
+            <img id="dino" src="https://rerofya.github.io/resources/dino.svg" alt="dino">
+            <img id="kaktus" src="https://rerofya.github.io/resources/cactus.svg" alt="cactus">
+            <button id="startBtn">Start</button>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+    <script>
+        const dino = document.getElementById('dino');
+const kaktus = document.getElementById('kaktus');
+const startBtn = document.getElementById('startBtn');
+
+let isAlive = false;
+
+// ១. អនុគមន៍បញ្ជាឱ្យដាយណូស័រលោត
+function jump() {
+    // ពិនិត្យមើលថាតើវាលោតរួចហើយឬនៅ បើមិនទាន់ទេទើបឱ្យលោត
+    if (!dino.classList.contains('jump')) {
+        dino.classList.add('jump');
+        
+        // លុប Class jump ចេញវិញក្រោយពេលលោតចប់ (500ms) ដើម្បីអាចលោតម្តងទៀតបាន
+        setTimeout(() => {
+            dino.classList.remove('jump');
+        }, 500);
+    }
+}
+
+// ២. ចាប់ផ្តើមហ្គេមពេលចុចប៊ូតុង Start
+startBtn.addEventListener('click', (e) => {
+    e.stopPropagation(); // ការពារកុំឱ្យជាន់គ្នាជាមួយការចុចលោត
+    isAlive = true;
+    startBtn.style.display = 'none'; // លាក់ប៊ូតុងលេង
+    kaktus.classList.add('kaktus-move'); // ឱ្យដើមដំបងយក្សចាប់ផ្តើមរត់
+});
+
+// ៣. បន្ថែមជម្រើស៖ ចុច Spacebar លើ Keyboard សម្រាប់លោត
+document.addEventListener('keydown', (event) => {
+    // ស្គាល់ទាំងប៊ូតុង Spacebar (Space) និង ព្រួញឡើងលើ (ArrowUp)
+    if ((event.code === 'Space' || event.code === 'ArrowUp') && isAlive) {
+        event.preventDefault(); // ការពារកុំឱ្យអេក្រង់អូសចុះក្រោមពេលចុច Spacebar
+        jump();
+    }
+});
+
+// ៤. បន្ថែមជម្រើស៖ ចុច Click ម៉ៅ ឬ Touch លើអេក្រង់កាតហ្គេម ក៏អាចលោតបានដែរ
+document.querySelector('.card').addEventListener('click', () => {
+    if (isAlive) {
+        jump();
+    }
+});
+
+// ៥. អនុគមន៍ត្រួតពិនិត្យការបុកគ្នា (Check Game Over)
+const checkCollision = setInterval(() => {
+    if (!isAlive) return;
+
+    // យកទីតាំងបច្ចុប្បន្នរបស់តួអង្គទាំងពីរលើអេក្រង់
+    const dinoBottom = parseInt(window.getComputedStyle(dino).getPropertyValue('bottom'));
+    const kaktusRight = parseInt(window.getComputedStyle(kaktus).getPropertyValue('right'));
+    
+    // គណនាទីតាំងពីស្តាំទៅឆ្វេង (បំប្លែងទៅជាទីតាំង Left ធៀបនឹងប្រវែង Container 600px)
+    const containerWidth = 600;
+    const kaktusLeft = containerWidth - kaktusRight - 25; // 25 គឺជាទំហំទទឹងរបស់ដំបងយក្ស
+
+    // បើដើមដំបងយក្សរត់មកដល់ចំដាយណូស័រ ហើយដាយណូស័រលោតមិនផុត
+    if (kaktusLeft > 50 && kaktusLeft < 100 && dinoBottom <= 15) {
+        isAlive = false;
+        kaktus.classList.remove('kaktus-move'); // ឱ្យដំបងយក្សឈប់រត់
+        startBtn.style.display = 'block'; // បង្ហាញប៊ូតុងលេងឡើងវិញ
+        startBtn.innerText = 'Restart';
+        alert('Game Over! ចុច Restart ដើម្បីលេងម្តងទៀត។');
+    }
+}, 10);
+    </script>
+</body>
+
+</html>

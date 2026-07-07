@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>3D Butterflies Background</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background-color: #8bceff;
+            overflow: hidden;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        /* ផ្ទៃ Canvas សម្រាប់បង្ហាញ 3D */
+        #app {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100vh;
+            z-index: 1;
+        }
+
+        /* ផ្ទាំងអក្សរពីលើ */
+        .content {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 10;
+            pointer-events: none;
+            text-align: center;
+        }
+
+        h1 {
+            color: #ffffff;
+            font-size: 4rem;
+            text-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+            font-weight: bold;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div id="app"></div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+
+    <script>
+        // ការកំណត់ទិន្នន័យ (Configuration) ដូចក្នុងរូបរបស់អ្នក
+        const config = {
+            el: document.getElementById('app'),
+            eventsEl: document.body,
+            gapsSize: 18,
+            background: 0x8BCEFF,
+            material: 'phong',
+            lights: [
+                { type: 'ambient', params: [0xffffff, 0.5] },
+                { type: 'directional', params: [0xffffff, 1], props: { position: [10, 0, 0] } }
+            ],
+            materialParams: { transparent: true, alphaTest: 0.5 },
+            texture: 'https://assets.codepen.io/33787/butterflies.png',
+            textureCount: 4,
+            wingsScale: [2, 2, 2],
+            wingsWidthSegments: 16,
+            wingsHeightSegments: 16,
+            wingSpeed: 0.79,
+            wingDisplacementScale: 1.25,
+            noiseCoordScale: 0.01,
+            noiseTimeCoef: 0.0005,
+            noiseIntensity: 0.0025,
+            attractionRadiusX: 100,
+            attractionRadiusY: 150,
+            maxVelocity: 0.1
+        };
+
+        // --- កូដបង្កើតប្រព័ន្ធ 3D Three.js ដើម្បីឱ្យមេអំបៅហោះបាន ---
+        const scene = new THREE.Scene();
+        scene.background = new THREE.Color(config.background);
+
+        const camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 1000);
+        camera.position.z = 30;
+
+        const renderer = new THREE.WebGLRenderer({ antialias: true });
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        config.el.appendChild(renderer.domElement);
+
+        // បន្ថែមពន្លឺ
+        config.lights.forEach(light => {
+            let l;
+            if (light.type === 'ambient') l = new THREE.AmbientLight(...light.params);
+            if (light.type === 'directional') {
+                l = new THREE.DirectionalLight(...light.params);
+                l.position.set(...light.props.position);
+            }
+            scene.add(l);
+        });
+
+        // ទាញយករូបភាពមេអំបៅ
+        const loader = new THREE.TextureLoader();
+        const butterflies = [];
+
+        loader.load(config.texture, (texture) => {
+            const geometry = new THREE.PlaneGeometry(2, 2, config.wingsWidthSegments, config.wingsHeightSegments);
+            const material = new THREE.MeshPhongMaterial({
+                map: texture,
+                transparent: config.materialParams.transparent,
+                alphaTest: config.materialParams.alphaTest,
+                side: THREE.DoubleSide
+            });
+
+            // បង្កើតមេអំបៅចំនួន 60
+            for (let i = 0; i < 60; i++) {
+                const mesh = new THREE.Mesh(geometry, material);
+                mesh.position.set(
+                    (Math.random() - 0.5) * 40,
+                    (Math.random() - 0.5) * 30,
+                    (Math.random() - 0.5) * 20
+                );
+                mesh.scale.set(...config.wingsScale);
+
+                mesh.userData = {
+                    speedY: Math.random() * config.maxVelocity + 0.02,
+                    speedX: (Math.random() - 0.5) * 0.05,
+                    flapSpeed: Math.random() * config.wingSpeed + 0.05,
+                    time: Math.random() * 100
+                };
+
+                scene.add(mesh);
+                butterflies.push(mesh);
+            }
+        });
+
+        // ដំណើរការគំនូរជីវចល (Loop Animation)
+        function animate() {
+            requestAnimationFrame(animate);
+
+            butterflies.forEach(b => {
+                b.userData.time += b.userData.flapSpeed;
+                b.rotation.y = Math.sin(b.userData.time) * config.wingDisplacementScale;
+
+                b.position.y += b.userData.speedY;
+                b.position.x += b.userData.speedX;
+
+                if (b.position.y > 20) {
+                    b.position.y = -20;
+                    b.position.x = (Math.random() - 0.5) * 40;
+                }
+            });
+            renderer.render(scene, camera);
+        }
+        animate();
+
+        // ធ្វើឱ្យពេញអេក្រង់ទោះជាបើកលើទូរស័ព្ទឬកុំព្យូទ័រ
+        window.addEventListener('resize', () => {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        });
+    </script>
+</body>

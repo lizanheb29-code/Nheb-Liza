@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Moni Creare - Soluciones Digitales</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Rajdhani:wght@300;400;500;600;700&family=Dancing+Script:wght@700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --neon-pink: #ff00ff;
+            --neon-cyan: #00ffff;
+            --neon-purple: #bc13fe;
+            --dark-bg: #050510;
+        }
+
+        body {
+            background-color: var(--dark-bg);
+            color: #e0e0e0;
+            font-family: 'Rajdhani', sans-serif;
+            overflow-x: hidden;
+            background-image: 
+                radial-gradient(circle at 10% 20%, rgba(188, 19, 254, 0.1) 0%, transparent 40%),
+                radial-gradient(circle at 90% 80%, rgba(0, 255, 255, 0.1) 0%, transparent 40%);
+        }
+
+        .orbitron { font-family: 'Orbitron', sans-serif; }
+        .handwriting { font-family: 'Dancing Script', cursive; }
+
+        .neon-border {
+            border: 1px solid rgba(188, 19, 254, 0.3);
+            box-shadow: 0 0 10px rgba(188, 19, 254, 0.2);
+            position: relative;
+        }
+
+        .neon-border-cyan {
+            border: 1px solid rgba(0, 255, 255, 0.3);
+            box-shadow: 0 0 10px rgba(0, 255, 255, 0.2);
+        }
+
+        .glow-text-pink { text-shadow: 0 0 10px var(--neon-pink); }
+        .glow-text-cyan { text-shadow: 0 0 10px var(--neon-cyan); }
+        .glow-text-purple { text-shadow: 0 0 10px var(--neon-purple); }
+
+        .card {
+            background: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(5px);
+            border-radius: 10px;
+            transition: transform 0.3s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            border-color: var(--neon-cyan);
+            box-shadow: 0 0 20px rgba(0, 255, 255, 0.3);
+        }
+
+        .m-logo {
+            font-size: 80px;
+            background: linear-gradient(to bottom, #bc13fe, #ff00ff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            filter: drop-shadow(0 0 10px #bc13fe);
+        }
+
+        .corner-accent {
+            position: absolute;
+            width: 15px;
+            height: 15px;
+            border-color: var(--neon-cyan);
+        }
+
+        .top-left { top: -2px; left: -2px; border-top: 2px solid; border-left: 2px solid; }
+        .bottom-right { bottom: -2px; right: -2px; border-bottom: 2px solid; border-right: 2px solid; }
+
+        .social-icon {
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            transition: all 0.3s ease;
+        }
+
+        .social-icon:hover {
+            border-color: var(--neon-cyan);
+            box-shadow: 0 0 15px var(--neon-cyan);
+            color: var(--neon-cyan);
+        }
+
+        .line-accent {
+            height: 1px;
+            background: linear-gradient(90deg, transparent, var(--neon-purple), transparent);
+        }
+    </style>
+</head>
+<body class="p-4 md:p-8 flex justify-center">
+    <div class="max-w-4xl w-full relative">
+        
+        <!-- Header -->
+        <header class="text-center mb-12">
+            <div class="flex justify-between items-start mb-4">
+                <div class="text-left text-xs space-y-1 text-gray-400">
+                    <p>⚡ CREATIVIDAD</p>
+                    <p>🎯 ESTRATEGIA</p>
+                    <p>🎨 DISEÑO</p>
+                    <p>🚀 INNOVACIÓN</p>
+                </div>
+                <div class="neon-border-cyan p-2 px-4 rounded text-xs">
+                    <p class="glow-text-cyan">SOLUCIONES</p>
+                    <p class="glow-text-cyan">DIGITALES</p>
+                </div>
+            </div>
+
+            <div class="m-logo orbitron font-bold leading-none">M</div>
+            <h1 class="orbitron text-5xl md:text-7xl font-bold tracking-widest text-white mb-2">MONI</h1>
+            <h2 class="orbitron text-3xl md:text-5xl font-light tracking-[0.5em] text-purple-400 mb-6">CREARE</h2>
+            <div class="flex justify-center gap-4 text-xs tracking-widest text-gray-400">
+                <span>CREAR</span> <span>•</span> <span>INSPIRAR</span> <span>•</span> <span>EMPRENDER</span>
+            </div>
+            
+            <div class="absolute right-0 top-1/4 text-right">
+                <p class="text-xs text-gray-500">TODO</p>
+                <p class="text-2xl font-bold glow-text-purple">100%</p>
+                <p class="text-xs text-gray-500">DIGITAL</p>
+            </div>
+        </header>
+
+        <!-- Intro Section -->
+        <section class="mb-12 flex flex-col md:flex-row gap-8 items-center border-y border-purple-900/30 py-8">
+            <div class="w-48 h-48 rounded-full overflow-hidden border-2 border-cyan-400/50 p-1">
+                <div class="w-full h-full bg-gray-800 flex items-center justify-center text-4xl">👩‍💻</div>
+            </div>
+            <div class="flex-1 text-center md:text-left">
+                <h3 class="text-2xl mb-2">¡HOLA! SOY <span class="text-pink-500 font-bold glow-text-pink">DAIANA</span></h3>
+                <p class="text-sm text-purple-300 mb-4">Fundadora de Moni Creare.</p>
+                <p class="text-gray-400 leading-relaxed max-w-lg">
+                    Comparto ideas, consejos y experiencias sobre emprendimiento, creatividad y herramientas digitales para ayudarte a crecer y alcanzar tus metas.
+                </p>
+                <p class="mt-4 text-xs text-cyan-400 tracking-widest uppercase">
+                    > IDEAS QUE INSPIRAN, SOLUCIONES QUE TRANSFORMAN. >>
+                </p>
+            </div>
+        </section>
+
+        <!-- Main Grid Title -->
+        <div class="text-center mb-8">
+            <h4 class="orbitron text-cyan-400 tracking-widest">¿CÓMO PUEDO AYUDARTE?</h4>
+        </div>
+
+        <!-- Services Grid -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
+            <!-- Card 1 -->
+            <div class="card p-6 neon-border relative group">
+                <div class="corner-accent top-left"></div>
+                <div class="corner-accent bottom-right"></div>
+                <div class="text-xs text-gray-500 mb-2">01</div>
+                <div class="text-3xl mb-4">✒️</div>
+                <h5 class="text-sm font-bold mb-2 uppercase text-gray-200">Diseños e Imágenes Personalizadas</h5>
+                <p class="text-xs text-gray-400">Creo diseños únicos y profesionales para tu marca, redes sociales, productos o proyectos.</p>
+            </div>
+
+            <!-- Card 2 -->
+            <div class="card p-6 neon-border relative">
+                <div class="corner-accent top-left"></div>
+                <div class="corner-accent bottom-right"></div>
+                <div class="text-xs text-gray-500 mb-2">02</div>
+                <div class="text-3xl mb-4">📂</div>
+                <h5 class="text-sm font-bold mb-2 uppercase text-gray-200">Archivos y Recursos Digitales</h5>
+                <p class="text-xs text-gray-400">Creo archivos editables, plantillas, presentaciones, PDFs y recursos que facilitan tu trabajo.</p>
+            </div>
+
+            <!-- Card 3 -->
+            <div class="card p-6 neon-border relative">
+                <div class="corner-accent top-left"></div>
+                <div class="corner-accent bottom-right"></div>
+                <div class="text-xs text-gray-500 mb-2">03</div>
+                <div class="text-3xl mb-4">📈</div>
+                <h5 class="text-sm font-bold mb-2 uppercase text-gray-200">Asesoría en Proyectos y Negocios</h5>
+                <p class="text-xs text-gray-400">Te acompaño con ideas, estrategias y orientación para llevar tu proyecto o negocio al siguiente nivel.</p>
+            </div>
+
+            <!-- Card 4 -->
+            <div class="card p-6 neon-border relative">
+                <div class="corner-accent top-left"></div>
+                <div class="corner-accent bottom-right"></div>
+                <div class="text-xs text-gray-500 mb-2">04</div>
+                <div class="text-3xl mb-4">💡</div>
+                <h5 class="text-sm font-bold mb-2 uppercase text-gray-200">Ideas, Consejos y Contenido Creativo</h5>
+                <p class="text-xs text-gray-400">Comparto tips, ideas y experiencias que te inspiran y te ayudan a crecer en el mundo digital.</p>
+            </div>
+
+            <!-- Card 5 -->
+            <div class="card p-6 neon-border relative">
+                <div class="corner-accent top-left"></div>
+                <div class="corner-accent bottom-right"></div>
+                <div class="text-xs text-gray-500 mb-2">05</div>
+                <div class="text-3xl mb-4">💻</div>
+                <h5 class="text-sm font-bold mb-2 uppercase text-gray-200">Soluciones Digitales para Emprendedores</h5>
+                <p class="text-xs text-gray-400">Todo lo que necesitas para organizar, comunicar y hacer crecer tu negocio de forma digital.</p>
+            </div>
+
+            <!-- Card 6 -->
+            <div class="card p-6 neon-border relative">
+                <div class="corner-accent top-left"></div>
+                <div class="corner-accent bottom-right"></div>
+                <div class="text-xs text-gray-500 mb-2">06</div>
+                <div class="text-3xl mb-4">👤</div>
+                <h5 class="text-sm font-bold mb-2 uppercase text-gray-200">Trabajos Personalizados</h5>
+                <p class="text-xs text-gray-400">Cada proyecto es único. El precio se adapta según el trabajo solicitado.</p>
+            </div>
+        </div>
+
+        <!-- Footer Contact -->
+        <div class="flex flex-col md:flex-row justify-between items-center gap-8 mb-12">
+            <div class="flex items-center gap-4 bg-purple-900/20 p-4 rounded-full border border-purple-500/30">
+                <div class="w-10 h-10 rounded-full bg-cyan-500/20 flex items-center justify-center">💬</div>
+                <div>
+                    <p class="text-[10px] text-gray-400 uppercase">Para más información</p>
+                    <p class="text-sm font-bold">COMUNICATE AL PRIVADO</p>
+                    <p class="text-[10px] text-cyan-400">¡ESTOY PARA AYUDARTE!</p>
+                </div>
+                <div class="text-pink-500">>>></div>
+            </div>
+
+            <div class="text-right">
+                <p class="text-xs text-gray-400">TRABAJOS PERSONALIZADOS</p>
+                <p class="text-xs text-gray-400">PRECIO SEGÚN EL TRABAJO</p>
+            </div>
+        </div>
+
+        <!-- Signature -->
+        <div class="flex flex-col md:flex-row justify-between items-end mb-12">
+            <div>
+                <span class="handwriting text-6xl text-pink-500 glow-text-pink">Daiana ♡</span>
+                <div class="mt-4 text-[10px] text-gray-500 space-y-1">
+                    <p>FUNDADORA DE MONI CREARE</p>
+                    <p>CREADORA DE CONTENIDO Y SOLUCIONES DIGITALES</p>
+                </div>
+            </div>
+            <div class="text-right text-[10px] text-gray-400">
+                <p>✓ 100% DIGITAL</p>
+                <p>✓ FLEXIBLE</p>
+                <p>✓ CREATIVO</p>
+                <p>✓ ENFOCADO EN RESULTADOS</p>
+            </div>
+        </div>
+
+        <!-- Social Media Bar -->
+        <div class="border-t border-purple-900/50 pt-8">
+            <p class="text-center text-[10px] tracking-[0.3em] text-gray-500 mb-6 uppercase">Encontrame en mis redes</p>
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                <div class="flex items-center gap-2 text-xs">
+                    <div class="social-icon">P</div>
+                    <span>MONI CREARE</span>
+                </div>
+                <div class="flex items-center gap-2 text-xs">
+                    <div class="social-icon">I</div>
+                    <span>MONI CREARE</span>
+                </div>
+                <div class="flex items-center gap-2 text-xs">
+                    <div class="social-icon">T</div>
+                    <span>MONI CREARE</span>
+                </div>
+                <div class="flex items-center gap-2 text-xs">
+                    <div class="social-icon">@</div>
+                    <span>MONI CREARE @GMAIL.COM</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Bottom Text -->
+        <div class="text-center mt-12 text-[10px] tracking-[0.2em] text-gray-600">
+            « CREAR, INSPIRAR Y EMPRENDER DESDE CASA. »
+        </div>
+
+    </div>
+</body>
+</html>

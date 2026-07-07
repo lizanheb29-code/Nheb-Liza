@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>3D Particle Galaxy & Morphing</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            overflow: hidden;
+            background-color: #000001;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        #canvas-container {
+            width: 100vw;
+            height: 100vh;
+            position: absolute;
+            top: 0;
+            left: 0;
+        }
+
+        #instructions {
+            position: absolute;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            color: rgba(255, 255, 255, 0.7);
+            user-select: none;
+            pointer-events: none;
+            text-align: center;
+            font-size: 14px;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            text-shadow: 0 0 10px rgba(0, 255, 255, 0.5);
+        }
+    </style>
+</head>
+
+<body>
+
+    <div id="canvas-container"></div>
+    <div id="instructions">Click anywhere to morph shapes</div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+
+    <script>
+        const container = document.getElementById('canvas-container');
+
+        // --- Exact state variables from your image ---
+        let currentShape = 0;
+        let targetShape = 0;
+        let isTransitioning = false;
+        let morphProgress = 0;
+        const TOTAL_SHAPES = 3;
+
+        // --- Core Three.js Setup ---
+        const scene = new THREE.Scene();
+        const camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 100);
+        camera.position.set(0, 15, 25);
+
+        // --- Renderer Settings from your image ---
+        const renderer = new THREE.WebGLRenderer({
+            antialias: false,
+            powerPreference: "high-performance",
+        });
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+        renderer.setClearColor(0x000001);
+        renderer.toneMapping = THREE.ACESFilmicToneMapping;
+        renderer.toneMappingExposure = 1.1;
+        container.appendChild(renderer.domElement);
+
+        // --- Controls Settings from your image ---
+        const controls = new THREE.OrbitControls(camera, renderer.domElement);
+        controls.enableDamping = true;
+        controls.dampingFactor = 0.03;
+        controls.enablePan = false;
+
+        // --- Particle Generation Logic ---
+        const particleCount = 50000;
+        const geometry = new THREE.BufferGeometry();
+
+        // Define arrays for position states
+        const positionsSource = new Float32Array(particleCount * 3);
+        const positionsTarget = new Float32Array(particleCount * 3);
+        const positionsCurrent = new Float32Array(particleCount * 3);
+        const colors = new Float32Array(particleCount * 3);
+
+        // Pre-generate geometry math for the 3 distinct shapes
+        function getShapePosition(shapeIndex, i) {
+            const i3 = i * 3;
+
+            if (shapeIndex === 0) {
+                // Shape 1: Spiral Galaxy (as seen in the preview)
+                const branches = 3;
+                const radius = Math.random() * 15;
+                const spinAngle = radius * 1.5;
+                const branchAngle = ((i % branches) / branches) * Math.PI * 2;
+
+                // Add core density and outer scattering
+                const randomX = Math.pow(Math.random(), 3) * (Math.random() < 0.5 ? 1 : -1) * 0.4 * radius;
+                const randomY = Math.pow(Math.random(), 3) * (Math.random() < 0.5 ? 1 : -1) * 0.4 * radius;
+                const randomZ = Math.pow(Math.random(), 3) * (Math.random() < 0.5 ? 1 : -1) * 0.4 * radius;
+                return {
+                    x: Math.cos(branchAngle + spinAngle) * radius + randomX,
+                    y: randomY,
+                    z: Math.sin(branchAngle + spinAngle) * radius + randomZ
+                };
+            } else if (shapeIndex === 1) {
+                // Shape 2: Solid Sphere
+                const u = Math.random();
+                const v = Math.random();
+                const theta = u * 2.0 * Math.PI;
+                const phi = Math.acos(2.0 * v - 1.0);
+                const r = Math.cbrt(Math.random()) * 10; // distributed inside sphere
+
+                return {
+                    x: r * Math.sin(phi) * Math.cos(theta),
+                    y: r * Math.sin(phi) * Math.sin(theta),
+                    z: r * Math.cos(phi)
+                };
+            } else {
+                // Shape 3: Cosmic Torus (Donut)
+                const r1 = 10; // main radius
+                const r2 = 3;  // tube radius
+                const theta = Math.random() * Math.PI * 2;
+                const phi = Math.random() * Math.PI * 2;
+
+                return {
+                    x: (r1 + r2 * Math.cos(phi)) * Math.cos(theta),
+                    y: r2 * Math.sin(phi),
+                    z: (r1 + r2 * Math.cos(phi)) * Math.sin(theta)
+                };
+            }
+        }
+
+        // Initialize coordinates & cinematic glowing color palette
+        const colorCore = new THREE.Color('#ffffff');
+        const colorSpur = new THREE.Color('#00bfff'); // Cyan/Blue glow
+
+        for (let i = 0; i < particleCount; i++) {
+            const i3 = i * 3;
+
+            // Initial positions (Shape 0: Galaxy)
+            const pos = getShapePosition(0, i);
+            positionsSource[i3] = pos.x;
+            positionsSource[i3 + 1] = pos.y;
+            positionsSource[i3 + 2] = pos.z;
+
+            positionsCurrent[i3] = pos.x;
+            positionsCurrent[i3 + 1] = pos.y;
+            positionsCurrent[i3 + 2] = pos.z;
+
+            // Color gradient scaling from core (bright white) to spiral edge (vibrant cyan)
+            const distFromCenter = Math.sqrt(pos.x * pos.x + pos.z * pos.z);
+            const mixedColor = colorCore.clone().lerp(colorSpur, distFromCenter / 15);
+
+            colors[i3] = mixedColor.r;
+            colors[i3 + 1] = mixedColor.g;
+            colors[i3 + 2] = mixedColor.b;
+        }
+
+        geometry.setAttribute('position', new THREE.BufferAttribute(positionsCurrent, 3));
+        geometry.setAttribute('color', new THREE.BufferAttribute(colors, 3));
+
+        // Creating a subtle custom particle texture for bright volumetric glow
+        const canvas = document.createElement('canvas');
+        canvas.width = 16;
+        canvas.height = 16;
+        const ctx = canvas.getContext('2d');
+        const gradient = ctx.createRadialGradient(8, 8, 0, 8, 8, 8);
+        gradient.addColorStop(0, 'rgba(255,255,255,1)');
+        gradient.addColorStop(1, 'rgba(255,255,255,0)');
+        ctx.fillStyle = gradient;
+        ctx.fillRect(0, 0, 16, 16);
+        const texture = new THREE.CanvasTexture(canvas);
+
+        const material = new THREE.PointsMaterial({
+            size: 0.07,
+            sizeAttenuation: true,
+            depthWrite: false,
+            blending: THREE.AdditiveBlending,
+            vertexColors: true,
+            map: texture,
+            transparent: true
+        });
+
+        const particleSystem = new THREE.Points(geometry, material);
+        scene.add(particleSystem);
+
+        // --- Morph & Trigger Logic ---
+        function transitionToNextShape() {
+            if (isTransitioning) return;
+
+            // Calculate targets
+            targetShape = (currentShape + 1) % TOTAL_SHAPES;
+
+            // Snapshot current coordinates into source
+            for (let i = 0; i < particleCount * 3; i++) {
+                positionsSource[i] = positionsCurrent[i];
+            }
+
+            // Generate exact destination geometry array
+            for (let i = 0; i < particleCount; i++) {
+                const i3 = i * 3;
+                const pos = getShapePosition(targetShape, i);
+                positionsTarget[i3] = pos.x;
+                positionsTarget[i3 + 1] = pos.y;
+                positionsTarget[i3 + 2] = pos.z;
+            }
+
+            morphProgress = 0;
+            isTransitioning = true;
+        }
+
+        window.addEventListener('click', transitionToNextShape);
+
+        // --- Handle Resizing ---
+        window.addEventListener('resize', () => {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        });
+
+        // --- Animation Loop ---
+        const clock = new THREE.Clock();
+
+        function animate() {
+            requestAnimationFrame(animate);
+
+            const elapsedTime = clock.getElapsedTime();
+            controls.update();
+
+            // Passive system rotation
+            particleSystem.rotation.y = elapsedTime * 0.05;
+
+            // Handle active morph linear interpolation (LERP) smooth transitions
+            if (isTransitioning) {
+                morphProgress += 0.02; // Adjust speed of shape shift here
+
+                // Cubic easing function for smooth deceleration 
+                const ease = 1 - Math.pow(1 - morphProgress, 3);
+
+                const posAttr = geometry.attributes.position;
+
+                for (let i = 0; i < particleCount * 3; i++) {
+                    positionsCurrent[i] = THREE.MathUtils.lerp(positionsSource[i], positionsTarget[i], ease);
+                }
+
+                posAttr.needsUpdate = true;
+
+                if (morphProgress >= 1) {
+                    morphProgress = 1;
+                    isTransitioning = false;
+                    currentShape = targetShape;
+                }
+            }
+
+            renderer.render(scene, camera);
+        }
+
+        animate();
+    </script>
+</body>
+
+</html>

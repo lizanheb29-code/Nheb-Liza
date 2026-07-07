@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Discovery of the Universe</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', system-ui, sans-serif;
+            background: radial-gradient(ellipse at top, #0b1a3a 0%, #050915 60%, #02030a 100%);
+            color: #e4ecff;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* stars */
+        body::before {
+            content: "";
+            position: fixed;
+            inset: 0;
+            background-image:
+                radial-gradient(1px 1px at 20% 30%, #fff, transparent),
+                radial-gradient(1px 1px at 70% 80%, #fff, transparent),
+                radial-gradient(2px 2px at 40% 60%, #9ecbff, transparent),
+                radial-gradient(1px 1px at 90% 20%, #fff, transparent),
+                radial-gradient(1px 1px at 10% 90%, #fff, transparent);
+            background-size: 400px 400px;
+            opacity: .6;
+            pointer-events: none;
+        }
+
+        nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 24px 60px;
+            position: relative;
+            z-index: 2;
+        }
+
+        .logo {
+            font-weight: 700;
+            letter-spacing: 3px;
+            color: #7fb3ff;
+        }
+
+        nav ul {
+            display: flex;
+            gap: 32px;
+            list-style: none;
+        }
+
+        nav a {
+            color: #cfd8ee;
+            text-decoration: none;
+            font-size: 14px;
+        }
+
+        nav a:hover {
+            color: #6cb4ff;
+        }
+
+        .hero {
+            position: relative;
+            padding: 60px 60px 120px;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 40px;
+            align-items: center;
+        }
+
+        .hero h1 {
+            font-size: 56px;
+            line-height: 1.05;
+            font-weight: 700;
+            margin-bottom: 24px;
+        }
+
+        .hero p {
+            color: #a9b6d4;
+            line-height: 1.7;
+            max-width: 460px;
+            margin-bottom: 32px;
+        }
+
+        .btn {
+            background: linear-gradient(135deg, #2b8fd6, #1c5fa8);
+            color: white;
+            border: none;
+            padding: 14px 32px;
+            border-radius: 30px;
+            font-weight: 600;
+            cursor: pointer;
+            box-shadow: 0 8px 24px rgba(43, 143, 214, .4);
+        }
+
+        .btn:hover {
+            filter: brightness(1.1);
+        }
+
+        .planet-visual {
+            position: relative;
+            height: 500px;
+        }
+
+        .planet {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 420px;
+            height: 420px;
+            border-radius: 50%;
+            background: radial-gradient(circle at 30% 30%, #6fb0e8, #1a3d6b 60%, #071528);
+            box-shadow: inset -40px -40px 80px rgba(0, 0, 0, .6), 0 0 80px rgba(80, 150, 220, .3);
+        }
+
+        .orbit {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            border: 1px solid rgba(120, 170, 230, .15);
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+        }
+
+        .orbit.o1 {
+            width: 550px;
+            height: 550px;
+        }
+
+        .orbit.o2 {
+            width: 700px;
+            height: 700px;
+        }
+
+        .orbit.o3 {
+            width: 850px;
+            height: 850px;
+        }
+
+        .moon {
+            position: absolute;
+            border-radius: 50%;
+            background: radial-gradient(circle at 30% 30%, #b0b0b0, #3a3a3a);
+        }
+
+        .moon.m1 {
+            width: 40px;
+            height: 40px;
+            top: 20%;
+            right: 15%;
+            background: radial-gradient(circle at 30% 30%, #d4785a, #6b2f1a);
+        }
+
+        .moon.m2 {
+            width: 60px;
+            height: 60px;
+            bottom: 15%;
+            right: 5%;
+        }
+
+        .features {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 40px;
+            padding: 40px 60px;
+        }
+
+        .feature h3 {
+            color: #6cb4ff;
+            margin-bottom: 12px;
+            font-size: 18px;
+        }
+
+        .feature p {
+            color: #98a5c2;
+            font-size: 14px;
+            line-height: 1.6;
+        }
+
+        .cards {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 20px;
+            padding: 40px 60px 80px;
+        }
+
+        .card {
+            background: linear-gradient(180deg, rgba(20, 40, 80, .6), rgba(10, 20, 45, .6));
+            border: 1px solid rgba(90, 130, 200, .2);
+            border-radius: 12px;
+            padding: 24px;
+            text-align: center;
+            backdrop-filter: blur(10px);
+        }
+
+        .card h4 {
+            color: #6cb4ff;
+            letter-spacing: 1px;
+            margin-bottom: 6px;
+        }
+
+        .card .val {
+            color: #7f8dab;
+            font-size: 12px;
+            margin-bottom: 20px;
+        }
+
+        .card-icon {
+            width: 70px;
+            height: 70px;
+            margin: 0 auto 16px;
+            border-radius: 50%;
+            background: radial-gradient(circle at 30% 30%, #f5a742, #7a3d0d);
+            box-shadow: 0 0 20px rgba(245, 167, 66, .3);
+        }
+
+        .card p {
+            color: #98a5c2;
+            font-size: 13px;
+            margin-bottom: 20px;
+            line-height: 1.5;
+        }
+
+        .card button {
+            background: transparent;
+            border: 1px solid rgba(108, 180, 255, .4);
+            color: #cfe0ff;
+            padding: 10px 20px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 13px;
+            width: 100%;
+        }
+
+        .card button:hover {
+            background: rgba(108, 180, 255, .1);
+        }
+    </style>
+</head>
+
+<body>
+
+    <nav>
+        <div class="logo">◎ STELLAR</div>
+        <ul>
+            <li><a href="#">Discovery</a></li>
+            <li><a href="#">Stars</a></li>
+            <li><a href="#">Cosmos</a></li>
+            <li><a href="#">Nebula</a></li>
+            <li><a href="#">Galaxy</a></li>
+        </ul>
+    </nav>
+
+    <section class="hero">
+        <div>
+            <h1>Discovery of<br />the Universe</h1>
+            <p>Explore the wonders of deep space through cutting-edge telescopes and stellar cartography. Journey
+                through galaxies, nebulae, and the mysteries that lie beyond our solar system.</p>
+            <button class="btn">Explore More</button>
+        </div>
+        <div class="planet-visual">
+            <div class="orbit o1"></div>
+            <div class="orbit o2"></div>
+            <div class="orbit o3"></div>
+            <div class="planet"></div>
+            <div class="moon m1"></div>
+            <div class="moon m2"></div>
+        </div>
+    </section>
+
+    <section class="features">
+        <div class="feature">
+            <h3>◉ The Mystery of the Cosmos</h3>
+            <p>Uncover the secrets held within the vast expanse of space, from black holes to distant quasars.</p>
+        </div>
+        <div class="feature">
+            <h3>💡 Cosmic Neighbors</h3>
+            <p>Meet the planets, moons, and asteroids that share our solar neighborhood.</p>
+        </div>
+        <div class="feature">
+            <h3>💧 Hottest Exoplanets</h3>
+            <p>Discover the scorching worlds orbiting distant stars beyond our own system.</p>
+        </div>
+    </section>
+
+    <section class="cards">
+        <div class="card">
+            <h4>CENTAUR</h4>
+            <div class="val">4.2 ly</div>
+            <div class="card-icon"></div>
+            <p>Nearest star system to our own, home to Proxima Centauri.</p>
+            <button>Discover</button>
+        </div>
+        <div class="card">
+            <h4>VEGA</h4>
+            <div class="val">25 ly</div>
+            <div class="card-icon" style="background: radial-gradient(circle at 30% 30%, #c0d8ff, #2a4a80);"></div>
+            <p>A brilliant blue-white star in the constellation Lyra.</p>
+            <button>Discover</button>
+        </div>
+        <div class="card">
+            <h4>KURVIAN URLS</h4>
+            <div class="val">80 ly</div>
+            <div class="card-icon" style="background: radial-gradient(circle at 30% 30%, #6fb0e8, #1a3d6b);"></div>
+            <p>Distant exoplanet with unique atmospheric conditions.</p>
+            <button>Discover</button>
+        </div>
+        <div class="card">
+            <h4>PROXIMA REAR</h4>
+            <div class="val">120 ly</div>
+            <div class="card-icon" style="background: radial-gradient(circle at 30% 30%, #d4785a, #6b2f1a);"></div>
+            <p>Rocky world orbiting within a habitable zone.</p>
+            <button>Discover</button>
+        </div>
+    </section>
+
+</body>
+
+</html>

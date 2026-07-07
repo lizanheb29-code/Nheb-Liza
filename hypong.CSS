@@ -1,0 +1,266 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    background-color: #1a1a1a;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    font-family: 'Montserrat', sans-serif;
+    overflow: hidden;
+}
+
+.poster-container {
+    position: relative;
+    width: 450px;
+    height: 670px;
+    background: #fdf5d6 url('https://www.transparenttextures.com/patterns/lined-paper.png');
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
+    overflow: hidden;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.poster-container::before {
+    content: "";
+    position: absolute;
+    top: 5%;
+    left: 5%;
+    right: 5%;
+    bottom: 5%;
+    background: radial-gradient(circle, #ffcc00 0%, rgba(253, 245, 214, 0) 70%);
+    z-index: 1;
+    pointer-events: none;
+}
+
+.inner-frame {
+    position: relative;
+    width: 88%;
+    height: 88%;
+    border: 4px solid #ffffff;
+    outline: 2px solid #ffcc00;
+    box-shadow: inset 0 0 20px rgba(255, 204, 0, 0.3);
+    z-index: 2;
+    overflow: hidden;
+}
+
+.tape {
+    position: absolute;
+    background-color: #ffcc00;
+    color: #111;
+    text-transform: uppercase;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+    z-index: 10;
+}
+
+.tape-top-left {
+    top: 20px;
+    left: -60px;
+    width: 320px;
+    height: 45px;
+    transform: rotate(-15deg);
+    font-family: 'Oswald', sans-serif;
+    justify-content: flex-end;
+    padding-right: 40px;
+    gap: 15px;
+}
+
+.tape-bottom-right {
+    bottom: 30px;
+    right: -80px;
+    width: 380px;
+    height: 50px;
+    transform: rotate(-20deg);
+    background-color: #ffcc00;
+    font-family: 'Oswald', sans-serif;
+    flex-direction: column;
+    justify-content: center;
+    align-items: self-start;
+    padding-left: 50px;
+}
+
+.tape-text-large {
+    font-size: 1.8rem;
+    font-weight: 900;
+    letter-spacing: -1px;
+}
+
+.tape-text-small {
+    font-size: 0.65rem;
+    background: #111;
+    color: #ffcc00;
+    padding: 2px 5px;
+    font-weight: bold;
+    border-radius: 3px;
+}
+
+.sub-badge-left {
+    font-size: 0.6rem;
+    font-weight: bold;
+    margin-top: -5px;
+}
+
+.vertical-bg-text {
+    position: absolute;
+    left: -40px;
+    top: 40%;
+    transform: rotate(-90deg) translateY(-50%);
+    font-family: 'Oswald', sans-serif;
+    font-size: 3.5rem;
+    color: rgba(218, 165, 32, 0.15);
+    font-weight: 700;
+    white-space: nowrap;
+}
+
+.top-right-bg-text {
+    position: absolute;
+    top: 10px;
+    right: 15px;
+    font-family: 'Oswald', sans-serif;
+    font-size: 2.8rem;
+    color: rgba(218, 165, 32, 0.18);
+    line-height: 0.9;
+    text-align: right;
+}
+
+.top-right-bg-text span {
+    display: block;
+    font-size: 1.6rem;
+}
+
+.sub-badge-left {
+    position: absolute;
+    top: 75px;
+    left: 20px;
+    font-size: 0.55rem;
+    font-weight: 900;
+    color: #333;
+    letter-spacing: 0.5px;
+    line-height: 1.3;
+}
+
+.sub-badge-left .star {
+    color: #ff9900;
+    font-size: 0.8rem;
+}
+
+.mini-blocks span {
+    display: inline-block;
+    width: 6px;
+    height: 6px;
+    background: #333;
+    margin-right: 2px;
+    margin-top: 3px;
+}
+
+.handwritten-text {
+    position: absolute;
+    right: 15px;
+    top: 150px;
+    font-family: 'Caveat', cursive;
+    font-size: 1.6rem;
+    color: #222;
+    line-height: 1;
+    transform: rotate(-5deg);
+    text-align: center;
+}
+
+.heart-icon {
+    font-size: 1rem;
+    margin-top: 5px;
+}
+
+.character-image-container {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
+    background: url('https://via.placeholder.com/400x600/transparent/ffffff?text=') no-repeat bottom center;
+    background-size: contain;
+    z-index: 4;
+}
+
+.character-glow {
+    position: absolute;
+    bottom: 10%;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 80%;
+    height: 60%;
+    background: radial-gradient(ellipse, rgba(255, 255, 255, 0.8) 0%, rgba(255, 255, 255, 0) 70%);
+    z-index: 3;
+    pointer-events: none;
+}
+.logo-badge-bottom-left {
+    position: absolute;
+    bottom: 110px;
+    left: 15px;
+    background: rgba(255,204,0,0.85);
+    border: 1px solid #ffaa00;
+    padding: 6px;
+    border-radius: 4px;
+    font-size: 0.5rem;
+    color: #111;
+    z-index: 5;
+    width: 75px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+
+}
+.badge-title {
+    font-weight: 900;
+    font-size: 0.65rem;
+}
+.badge-subtitle {
+    font-size: 0.4rem;
+    font-weight: bold;
+    margin-bottom: 2px;
+}
+.barcode {
+    font-size: 0.45rem;
+    letter-spacing: -0.5px;
+}
+.motto-text {
+    position: absolute;
+    bottom: 25px;
+    left: 15px;
+    font-size: 0.55rem;
+    font-weight: bold;
+    color: #444;
+    line-height: 1.3;
+    z-index: 5;
+}
+.motto-text .star {
+    color: #ffaa00;
+}
+.main-nameplate  {
+    position: absolute;
+    bottom: 50px;
+    left: 5%;
+    width: 90%;
+    height: 55px;
+    background: #111;
+    border: 2px solid #ffcc00;
+    display: flex;
+    z-index: 6;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+}
+.name-section {
+    flex: 2;
+    background-color: #111;
+    color: #ffcc00;
+    font-family: 'Oswald', sans-serif;
+    font-size: 2.2rem;
+    font-weight: 700;
+    display: flex;
+    align-items: 15px;
+    letter-spacing: 1px;
+}

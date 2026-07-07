@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Scorpion Cursor Animation</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background-color: #0b0c10;
+            overflow: hidden;
+            width: 100vw;
+            height: 100vh;
+            cursor: crosshair;
+        }
+
+        canvas {
+            display: block;
+            width: 100%;
+            height: 100%;
+        }
+    </style>
+</head>
+
+<body>
+
+    <canvas id="scorpionCanvas"></canvas>
+
+    <script>
+        const canvas = document.getElementById('scorpionCanvas');
+        const ctx = canvas.getContext('2d');
+
+        // Resize handler
+        function resize() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+        window.addEventListener('resize', resize);
+        resize();
+
+        // Mouse tracking state
+        const mouse = {
+            x: window.innerWidth / 2,
+            y: window.innerHeight / 2,
+            targetX: window.innerWidth / 2,
+            targetY: window.innerHeight / 2
+        };
+
+        window.addEventListener('mousemove', (e) => {
+            mouse.targetX = e.clientX;
+            mouse.targetY = e.clientY;
+        });
+
+        // --- Node / Segment Class ---
+        class Node {
+            constructor(x, y, parent = null) {
+                this.x = x;
+                this.y = y;
+                this.parent = parent;
+                this.isSegment = true;
+            }
+        }
+
+        // --- Limb System (IK / Leg Logic) ---
+        class LimbSystem {
+            constructor(hipNode, length, segmentLength, side) {
+                this.hip = hipNode; // Node where leg attaches
+                this.length = length; // Number of joints
+                this.segLen = segmentLength;
+                this.side = side; // 1 for right, -1 for left
+                this.joints = [];
+
+                // Initialize joint positions outward from the hip
+                let currentX = hipNode.x;
+                let currentY = hipNode.y;
+                for (let i = 0; i < length; i++) {
+                    currentX += side * segmentLength;
+                    this.joints.push({ x: currentX, y: currentY });
+                }
+
+                // Target step tracking position
+                this.targetX = currentX;
+                this.targetY = currentY + 30;
+                this.currentStepX = currentX;
+                this.currentStepY = currentY + 30;
+            }
+
+            update(angle) {
+                // Determine where the leg ideally wants to plant based on creature position & heading
+                const idealX = this.hip.x + Math.cos(angle + (this.side * Math.PI / 2.5)) * (this.length * this.segLen * 1.2);
+                const idealY = this.hip.y + Math.sin(angle + (this.side * Math.PI / 2.5)) * (this.length * this.segLen * 1.2);
+
+                // If the ideal step position gets too far from current footing, trigger a new step
+                const distToIdeal = Math.hypot(idealX - this.targetX, idealY - this.targetY);
+                if (distToIdeal > 40) {
+                    this.targetX = idealX + (Math.random() - 0.5) * 10;
+                    this.targetY = idealY + (Math.random() - 0.5) * 10;
+                }
+
+                // Smoothly slide step towards the target position
+                this.currentStepX += (this.targetX - this.currentStepX) * 0.25;
+                this.currentStepY += (this.targetY - this.currentStepY) * 0.25;
+
+                // Backward Inverse Kinematics pass (from foot up to hip)
+                this.joints[this.length - 1].x = this.currentStepX;
+                this.joints[this.length - 1].y = this.currentStepY;
+                for (let i = this.length - 2; i >= 0; i--) {
+                    const next = this.joints[i + 1];
+                    const curr = this.joints[i];
+                    const dx = curr.x - next.x;
+                    const dy = curr.y - next.y;
+                    const dist = Math.hypot(dx, dy) || 1;
+                    curr.x = next.x + (dx / dist) * this.segLen;
+                    curr.y = next.y + (dy / dist) * this.segLen;
+                }
+
+                // Forward pass fix (snap base leg joint back onto the moving hip node)
+                this.joints[0].x = this.hip.x;
+                this.joints[0].y = this.hip.y;
+                for (let i = 1; i < this.length; i++) {
+                    const prev = this.joints[i - 1];
+                    const curr = this.joints[i];
+                    const dx = curr.x - prev.x;
+                    const dy = curr.y - prev.y;
+                    const dist = Math.hypot(dx, dy) || 1;
+                    curr.x = prev.x + (dx / dist) * this.segLen;
+                    curr.y = prev.y + (dy / dist) * this.segLen;
+                }
+            }
+
+            draw(ctx) {
+                ctx.beginPath();
+                ctx.strokeStyle = 'rgba(200, 220, 255, 0.45)';
+                ctx.lineWidth = 2;
+                ctx.moveTo(this.hip.x, this.hip.y);
+                for (let i = 0; i < this.length; i++) {
+                    ctx.lineTo(this.joints[i].x, this.joints[i].y);
+                }
+                ctx.stroke();
+
+                // Draw tiny joint nodes
+                ctx.fillStyle = 'rgba(255, 255, 255, 0.8)';
+                for (let i = 0; i < this.length; i++) {
+                    ctx.beginPath();
+                    ctx.arc(this.joints[i].x, this.joints[i].y, i === this.length - 1 ? 3 : 1.5, 0, Math.PI * 2);
+                    ctx.fill();
+                }
+            }
+        }
+
+        // --- Creature Core Setup ---
+        const totalBodySegments = 36;
+        const segmentSpacing = 11;
+        const nodes = [];
+
+        // Generate central spine chain
+        let prevNode = null;
+        for (let i = 0; i < totalBodySegments; i++) {
+            const n = new Node(mouse.x, mouse.y, prevNode);
+            nodes.push(n);
+            prevNode = n;
+        }
+
+        // Attach legs to specific spinal segments (e.g., segments 4 through 12)
+        const limbs = [];
+        for (let i = 4; i <= 14; i += 2) {
+            limbs.push(new LimbSystem(nodes[i], 3, 14, 1));  // Right side legs
+            limbs.push(new LimbSystem(nodes[i], 3, 14, -1)); // Left side legs
+        }
+
+        // --- Main Game/Animation Loop ---
+        function animate() {
+            requestAnimationFrame(animate);
+
+            // Smooth out mouse input tracking
+            mouse.x += (mouse.targetX - mouse.x) * 0.08;
+            mouse.y += (mouse.targetY - mouse.y) * 0.08;
+
+            // Update spine leading head node
+            nodes[0].x = mouse.x;
+            nodes[0].y = mouse.y;
+
+            // Constrain remaining spinal nodes down the chain link lengths
+            for (let i = 1; i < nodes.length; i++) {
+                const curr = nodes[i];
+                const prev = nodes[i - 1];
+
+                const dx = curr.x - prev.x;
+                const dy = curr.y - prev.y;
+                const dist = Math.hypot(dx, dy) || 1;
+
+                if (dist > segmentSpacing) {
+                    curr.x = prev.x + (dx / dist) * segmentSpacing;
+                    curr.y = prev.y + (dy / dist) * segmentSpacing;
+                }
+            }
+
+            // Clear Screen
+            ctx.fillStyle = '#0b0c10';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            // Update & Render Limbs
+            limbs.forEach((limb) => {
+                // Get general orientation angle of the spine node
+                const parentNode = limb.hip.parent || nodes[0];
+                const angle = Math.atan2(limb.hip.y - parentNode.y, limb.hip.x - parentNode.x);
+                limb.update(angle);
+                limb.draw(ctx);
+            });
+            // Draw Spine & Rib Segments
+            for (let i = 0; i < nodes.length; i++) {
+                const curr = nodes[i];
+                const next = nodes[i + 1] || curr;
+
+                // Angle perpendicular to segment direction
+                const angle = Math.atan2(next.y - curr.y, next.x - curr.x);
+                const perpAngle = angle + Math.PI / 2;
+
+                // Dynamically scale ribs (thicker near head/torso, tapering at tail)
+                let ribWidth = 0;
+                if (i < 16) {
+                    ribWidth = 14 + (i * 0.8); // Torso thickening
+                } else {
+                    ribWidth = 26 - ((i - 16) * 0.9); // Tail tapering down
+                    if (ribWidth < 3) ribWidth = 3;
+                }
+
+                const leftRibX = curr.x + Math.cos(perpAngle) * ribWidth;
+                const leftRibY = curr.y + Math.sin(perpAngle) * ribWidth;
+                const rightRibX = curr.x - Math.cos(perpAngle) * ribWidth;
+                const rightRibY = curr.y - Math.sin(perpAngle) * ribWidth;
+
+                // Draw horizontal skeletal rib line
+                ctx.beginPath();
+                ctx.strokeStyle = 'rgba(255, 255, 255, 0.25)';
+                ctx.lineWidth = i < 16 ? 2.5 : 1.5;
+                ctx.moveTo(leftRibX, leftRibY);
+                ctx.lineTo(rightRibX, rightRibY);
+                ctx.stroke();
+
+                // Draw outer tips of the ribs
+                ctx.fillStyle = 'rgba(255, 255, 255, 0.5)';
+                ctx.beginPath();
+                ctx.arc(leftRibX, leftRibY, i < 16 ? 2 : 1, 0, Math.PI * 2);
+                ctx.arc(rightRibX, rightRibY, i < 16 ? 2 : 1, 0, Math.PI * 2);
+                ctx.fill();
+
+                // Central spine node core
+                ctx.fillStyle = 'rgba(200, 230, 255, 0.6)';
+                ctx.beginPath();
+                ctx.arc(curr.x, curr.y, 2, 0, Math.PI * 2);
+                ctx.fill();
+            }
+        }
+
+        animate();
+    </script>
+</body>
+
+</html>
